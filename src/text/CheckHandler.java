@@ -35,17 +35,14 @@ public class CheckHandler {
 
         for (int i = 1; i < txtChecks.length; i++) {
             String name = null;
-            int prio = 0;
             String cfg = null;
             String errors = null;
 
             String[] checksInfosArray = this.splitNameAndErrors(txtChecks[i]);
-
-            String name_prio[] = checksInfosArray[0].split("\n");
-            if (!(name_prio[0].isEmpty()) || (!(name_prio[1].isEmpty()) || (name_prio[1] != null))) {
-                name = name_prio[0].trim(); //get name
-                prio = Integer.valueOf(name_prio[1]); //get prio
-
+            //Extract the check name from the array checksInfosArray.
+            String checkName = checksInfosArray[0];
+            if (!checkName.isEmpty()) {
+                name = checkName.trim(); //get name
                 if (checksInfosArray.length > 1) {
                     if (checksInfosArray[1].contains(Constantes.STRING_CONFIG)) {
                         String[] errorsAndCfg = this.splitErrorsAndConfig(checksInfosArray[1]);
@@ -66,7 +63,7 @@ public class CheckHandler {
                     
                 }
 
-                TXTCheck checkInfos = new TXTCheck(name, prio, cfg, errors);
+                TXTCheck checkInfos = new TXTCheck(name, cfg, errors);
 
                 txtChecksInfos.put(txtChecksInfos.size() + 1, checkInfos);
             }

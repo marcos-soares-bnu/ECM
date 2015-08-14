@@ -25,5 +25,4 @@ public class Logic {
         }
         return errors;
     }
-
 }
