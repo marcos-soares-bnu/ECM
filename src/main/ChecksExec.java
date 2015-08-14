@@ -1,7 +1,10 @@
 package main;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
@@ -123,12 +126,33 @@ public class ChecksExec {
             if (cItem.getStatus().equalsIgnoreCase("NOK") || cItem.getStatus().equalsIgnoreCase("WARNING")) {
                 for (OBJCheckOutput err : cItem.getErrors().values()) {
                     String output = err.getOutput_error();
-                    int isNew = this.checkIsNewError(checkID, checkItemID, err) ? 1 : 0;
+                    
+                    // MPS - ini...
+                    //
+                    //return list of New Erros and record on DB...
+                    List<String> arrayItemLastErrors = new ArrayList<String>();                    
+                    arrayItemLastErrors = this.arrCheckIsNewError(checkID, checkItemID, err);
+                    //
+                    //
+                    if (arrayItemLastErrors.size() > 1){
 
-                    //Create the error output
-                    DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, output, exec_time, isNew);
-                    //grava as informações contidas no objCheck no banco
-                    dbOutput.DB_store();
+                        for (DBCheckOutput out : dbLastErrors.values()) {
+                        	if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
+
+                                //Create the error output
+                                DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, out.getOutput_error(), exec_time, 1); //isNew);
+                                //grava as informações contidas no objCheck no banco
+                                dbOutput.DB_store();
+                        	}
+                        }        
+                    }
+                    else{
+                        //Create the error output
+                        DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, output, exec_time, 0); //isNew);
+                        //grava as informações contidas no objCheck no banco
+                        dbOutput.DB_store();
+                    }
+                    // MPS - fim...
                 }
             } else {
                 String output = "No Errors.";
@@ -140,7 +164,9 @@ public class ChecksExec {
         }
     }
 
-    private boolean checkIsNewError(int checkID, int checkItemID, OBJCheckOutput err) {
+    // MPS - ini...
+    /*
+    private boolean checkIsNewErrorBKP(int checkID, int checkItemID, OBJCheckOutput err) {
         boolean isNew = true;
         for (DBCheckOutput out : dbLastErrors.values()) {
             if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
@@ -155,4 +181,52 @@ public class ChecksExec {
         }
         return isNew;
     }
+	*/
+
+    //
+    private List<String> arrCheckIsNewError(int checkID, int checkItemID, OBJCheckOutput err) {
+        
+    	List<String> lstNew = new ArrayList<String>();
+
+        //Store just items of checkID and checkItemID...
+        List<String> arrayItemLastErrors = new ArrayList<String>();
+        //
+        for (DBCheckOutput out : dbLastErrors.values()) {
+        	if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
+        		arrayItemLastErrors.add(out.getOutput_error());
+            }
+        }        
+        //
+        
+        //Split err, for more than One... 
+        String[] arrayMonErrors = err.getOutput_error().split("\n");
+        //
+
+        lstNew = arrNewErrors(arrayMonErrors, arrayItemLastErrors);
+        
+        return lstNew;
+    }
+
+    // same as Arrays.equals()
+    private List<String> arrNewErrors(String[] arr1, List<String> arr2) {
+    	
+        //Store just items of checkID and checkItemID...
+        List<String> arrayItemNewErrors = new ArrayList<String>(arr2);
+        //
+
+        for (String s : arr1){
+    
+        	if (arrayItemNewErrors.contains(s)){
+        		arrayItemNewErrors.remove(s);
+        	} else {
+        		arrayItemNewErrors.add(s);
+        	}
+        }
+        
+        return arrayItemNewErrors;
+    }    
+    //MPS - fim...
+    
+    
+    
 }
