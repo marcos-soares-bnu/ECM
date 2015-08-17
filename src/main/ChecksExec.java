@@ -127,32 +127,47 @@ public class ChecksExec {
                 for (OBJCheckOutput err : cItem.getErrors().values()) {
                     String output = err.getOutput_error();
                     
+                    //==============================================================================
                     // MPS - ini...
                     //
                     //return list of New Erros and record on DB...
                     List<String> arrayItemLastErrors = new ArrayList<String>();                    
                     arrayItemLastErrors = this.arrCheckIsNewError(checkID, checkItemID, err);
-                    //
-                    //
-                    if (arrayItemLastErrors.size() > 1){
-
+                    //******************************************************************************
+                    //Test Hard-code items set to more than 1 ticket/error line
+                    //******************************************************************************
+                    if 	(	(	cItem.getItemName() == "MON018" 	|| cItem.getItemName() == "MON019" 		||
+                    			cItem.getItemName() == "MON020" 	|| cItem.getItemName() == "OTASS012" 	||
+                       			cItem.getItemName() == "OTASS013" 	|| cItem.getItemName() == "DPWIN002"
+                    		)	&&	(arrayItemLastErrors.size() > 0)
+                    	){
+                    	//Insert in DB with flag is_new = 1...
+                        for (String serr : arrayItemLastErrors) {
+                    		//Create the error output
+                            DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, serr, exec_time, 1); //isNew);
+                            //grava as informações contidas no objCheck no banco
+                            dbOutput.DB_store();
+                        }
+                    	//
+                    	//Insert in DB with flag is_new = 0...
                         for (DBCheckOutput out : dbLastErrors.values()) {
                         	if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
-
-                                //Create the error output
-                                DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, out.getOutput_error(), exec_time, 1); //isNew);
+                        		//Create the error output
+                                DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, out.getOutput_error(), exec_time, 0); //isNew);
                                 //grava as informações contidas no objCheck no banco
                                 dbOutput.DB_store();
                         	}
                         }        
                     }
                     else{
+                    	int isNew = this.checkIsNewError(checkID, checkItemID, err) ? 1 : 0;                    	
                         //Create the error output
-                        DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, output, exec_time, 0); //isNew);
+                        DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, output, exec_time, isNew);
                         //grava as informações contidas no objCheck no banco
                         dbOutput.DB_store();
                     }
                     // MPS - fim...
+                    //==============================================================================
                 }
             } else {
                 String output = "No Errors.";
@@ -164,9 +179,9 @@ public class ChecksExec {
         }
     }
 
+    //==============================================================================
     // MPS - ini...
-    /*
-    private boolean checkIsNewErrorBKP(int checkID, int checkItemID, OBJCheckOutput err) {
+    private boolean checkIsNewError(int checkID, int checkItemID, OBJCheckOutput err) {
         boolean isNew = true;
         for (DBCheckOutput out : dbLastErrors.values()) {
             if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
@@ -181,7 +196,6 @@ public class ChecksExec {
         }
         return isNew;
     }
-	*/
 
     //
     private List<String> arrCheckIsNewError(int checkID, int checkItemID, OBJCheckOutput err) {
@@ -215,17 +229,23 @@ public class ChecksExec {
         //
 
         for (String s : arr1){
-    
         	if (arrayItemNewErrors.contains(s)){
         		arrayItemNewErrors.remove(s);
         	} else {
         		arrayItemNewErrors.add(s);
         	}
         }
+        //
+        for (String s : arr2){
+        	if (arrayItemNewErrors.contains(s)){
+        		arrayItemNewErrors.remove(s);
+        	}
+        }
         
         return arrayItemNewErrors;
     }    
     //MPS - fim...
+    //==============================================================================
     
     
     
