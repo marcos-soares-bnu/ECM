@@ -188,7 +188,13 @@ public class ChecksExec {
                 //Encontrou o item correto
 
                 //Verifica se é o mesmo erro
-                if (out.getOutput_error().equalsIgnoreCase(err.getOutput_error())) {
+                //if (out.getOutput_error().equalsIgnoreCase(err.getOutput_error())) {
+            	//-----------------------------------------------------------
+            	//Se o erro antigo não existir, isNew = false
+            	//Para todos os casos que se abre apenas um ticket por check,
+            	//Só será Novo erro se o anterior for = "No Errors."
+            	//-----------------------------------------------------------
+            	if (!out.getOutput_error().contains("No Errors.")){
                     isNew = false;
                     break;
                 }
