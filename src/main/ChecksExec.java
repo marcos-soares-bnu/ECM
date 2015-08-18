@@ -16,7 +16,7 @@ import database.DBCheckConfig;
 import database.DBCheckItem;
 import database.DBCheckOutput;
 
-//MPS
+// MPS
 import util.Constantes;
 //
 
@@ -61,34 +61,31 @@ public class ChecksExec {
     }
 
     public void execCheck() {
-        
-    	if (Constantes.LINDE_ENVIRONMENT) {
-    		this.callCMD();
-    	}
-    	else {
-    		
-    		//Tratamento para cada log:
+        if (Constantes.LINDE_ENVIRONMENT) {
+            this.callCMD();
+        } else {
+            //Tratamento para cada log:
             switch (objCheck.getId()) {
                 case Constantes.DB_INFRA_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script_result\\sched_infra.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_infra.log");
                     break;
                 case Constantes.DB_DPWIN_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script_result\\sched_dpwin.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_dpwin.log");
                     break;
                 case Constantes.DB_SQL_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script_result\\sched_sql.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_sql.log");
                     break;
                 case Constantes.DB_FCIR_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script_result\\sched_fcir.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_fcir2.log");
                     break;
                 case Constantes.DB_PIXCORE_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script_result\\sched_pixcore.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_pixcore.log");
                     break;
-                    
+
                 default:
                     break;
             }
-    	}
+        }
         this.checkCMDOutput();
     }
 

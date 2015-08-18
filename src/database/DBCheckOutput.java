@@ -1,5 +1,6 @@
 package database;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
@@ -45,7 +46,7 @@ public class DBCheckOutput {
         this.is_new = is_new;
         this.mail_sent = 0;
     }
-    
+
     public DBCheckOutput(int check_id, int check_item_id, String status, String output_error, Date exec_time) {
         this.check_id = check_id;
         this.check_item_id = check_item_id;
@@ -140,7 +141,7 @@ public class DBCheckOutput {
             if (!strDBLastExec.isEmpty()) {
                 String condition = "check_id=" + this.getCheck_id() + " AND exec_time = '" + strDBLastExec + "'";
                 ResultSet rs = db.doSelect("*", Constantes.DB_ChecksOutput_Table, condition);
-                
+
                 try {
                     while (rs.next()) {
                         int id = rs.getInt("id");
@@ -150,7 +151,7 @@ public class DBCheckOutput {
                         Timestamp execTime = rs.getTimestamp("exec_time");
                         int isNew = rs.getByte("is_new");
                         int mailSent = rs.getByte("mail_sent");
-                        
+
                         DBCheckOutput err = new DBCheckOutput(id, check_id, checkItemID, status, error, new Date(execTime.getTime()), isNew, mailSent);
                         lastErrors.put(lastErrors.size() + 1, err);
                     }
@@ -163,7 +164,7 @@ public class DBCheckOutput {
         return lastErrors;
     }
 
-    public void DB_store() {
+    public void DB_store_OLD() {
         //metodo para gravar este item no banco
         DBUtil db = new DBUtil();
         String table = Constantes.DB_ChecksOutput_Table;
@@ -173,5 +174,31 @@ public class DBCheckOutput {
                 "'" + strDate + "'," +  this.getIs_new() + "," + this.getMail_sent();
         
         db.doINSERT(table, fields, values);
+    }
+    
+    public void DB_store() {
+        //metodo para gravar este item no banco
+        DBUtil db = new DBUtil();
+        String table = Constantes.DB_ChecksOutput_Table;
+        String fields = "check_id, check_item_id, status, output_error, exec_time, is_new, mail_sent";
+
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = db.getConn().prepareStatement("INSERT INTO " + table + "(" + fields + ")" + " VALUES (?, ?, ?, ?, ?, ?, ?);");
+
+            pstmt.setInt(1, this.getCheck_id());
+            pstmt.setInt(2, this.getCheck_item_id());
+            pstmt.setString(3, this.getStatus());
+            pstmt.setString(4, this.getOutput_error());
+            pstmt.setTimestamp(5, new Timestamp((this.getExec_time().getTime())));
+            pstmt.setInt(6, this.getIs_new());
+            pstmt.setInt(7, this.getMail_sent());
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e);
+        }
+
+        db.doINSERT(pstmt);
     }
 }
