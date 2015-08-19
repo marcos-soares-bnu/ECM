@@ -142,7 +142,7 @@ public class ChecksExec {
                     	//
                     	//Insert in DB with flag is_new = 0...
                         for (DBCheckOutput out : dbLastErrors.values()) {
-                        	if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
+                        	if ( (!out.getOutput_error().equals("No Errors.")) && (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) ) {
                         		//Create the error output
                                 DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, out.getOutput_error(), exec_time, 0); //isNew);
                                 //grava as informações contidas no objCheck no banco
