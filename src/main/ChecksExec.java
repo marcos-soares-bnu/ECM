@@ -129,10 +129,9 @@ public class ChecksExec {
                     //******************************************************************************
                     //Test Hard-code items set to more than 1 ticket/error line
                     //******************************************************************************
-                    if 	  ((cItem.getItemName() == "MON018" 	|| cItem.getItemName() == "MON019" 		||
-                            cItem.getItemName() == "MON020" 	|| cItem.getItemName() == "OTASS012" 	||
-                       		cItem.getItemName() == "OTASS013" 	|| cItem.getItemName() == "DPWIN002"
-                           ) && (arrayItemLastErrors.size() > 0)) {
+                    if	(	cItem.getItemName().equals("MON018")	|| cItem.getItemName().equals("MON019") 	||
+                            cItem.getItemName().equals("MON020")	|| cItem.getItemName().equals("OTASS012") 	||
+                       		cItem.getItemName().equals("OTASS013") 	|| cItem.getItemName().equals("DPWIN002")	){
                         //Insert in DB with flag is_new = 1...
                         for (String serr : arrayItemLastErrors) {
                             //Create the error output
