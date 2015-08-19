@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /RunOTASS.class
 /change
 /database
@@ -7,3 +8,9 @@
 /text
 /util
 /doc/
+=======
+/main/
+/util/
+/database/
+/test.class
+>>>>>>> refs/heads/vvv_work

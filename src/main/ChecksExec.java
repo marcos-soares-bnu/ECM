@@ -2,26 +2,22 @@ package main;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
 
+import database.DBCheck;
+import database.DBCheckConfig;
+import database.DBCheckItem;
+import database.DBCheckOutput;
 import object.OBJCheck;
 import object.OBJCheckItem;
 import object.OBJCheckOutput;
 import text.CheckHandler;
 import text.FileReaderUtil;
-import database.DBCheck;
-import database.DBCheckConfig;
-import database.DBCheckItem;
-import database.DBCheckOutput;
-
-//MPS - teste commit MPS_work...
 import util.Constantes;
-//
 
 public class ChecksExec {
 
@@ -64,34 +60,31 @@ public class ChecksExec {
     }
 
     public void execCheck() {
-        
-    	if (Constantes.LINDE_ENVIRONMENT) {
-    		this.callCMD();
-    	}
-    	else {
-    		
-    		//Tratamento para cada log:
+        if (Constantes.LINDE_ENVIRONMENT) {
+            this.callCMD();
+        } else {
+            //Tratamento para cada log:
             switch (objCheck.getId()) {
                 case Constantes.DB_INFRA_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script_result\\sched_infra.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_infra.log");
                     break;
                 case Constantes.DB_DPWIN_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script_result\\sched_dpwin.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_dpwin.log");
                     break;
                 case Constantes.DB_SQL_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script_result\\sched_sql.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_sql.log");
                     break;
                 case Constantes.DB_FCIR_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script_result\\sched_fcir.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_fcir2.log");
                     break;
                 case Constantes.DB_PIXCORE_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script_result\\sched_pixcore.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_pixcore.log");
                     break;
-                    
+
                 default:
                     break;
             }
-    	}
+        }
         this.checkCMDOutput();
     }
 
@@ -136,14 +129,13 @@ public class ChecksExec {
                     //******************************************************************************
                     //Test Hard-code items set to more than 1 ticket/error line
                     //******************************************************************************
-                    if 	(	(	cItem.getItemName() == "MON018" 	|| cItem.getItemName() == "MON019" 		||
-                    			cItem.getItemName() == "MON020" 	|| cItem.getItemName() == "OTASS012" 	||
-                       			cItem.getItemName() == "OTASS013" 	|| cItem.getItemName() == "DPWIN002"
-                    		)	&&	(arrayItemLastErrors.size() > 0)
-                    	){
-                    	//Insert in DB with flag is_new = 1...
+                    if 	  ((cItem.getItemName() == "MON018" 	|| cItem.getItemName() == "MON019" 		||
+                            cItem.getItemName() == "MON020" 	|| cItem.getItemName() == "OTASS012" 	||
+                       		cItem.getItemName() == "OTASS013" 	|| cItem.getItemName() == "DPWIN002"
+                           ) && (arrayItemLastErrors.size() > 0)) {
+                        //Insert in DB with flag is_new = 1...
                         for (String serr : arrayItemLastErrors) {
-                    		//Create the error output
+                            //Create the error output
                             DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, serr, exec_time, 1); //isNew);
                             //grava as informações contidas no objCheck no banco
                             dbOutput.DB_store();
@@ -189,12 +181,12 @@ public class ChecksExec {
 
                 //Verifica se é o mesmo erro
                 //if (out.getOutput_error().equalsIgnoreCase(err.getOutput_error())) {
-            	//-----------------------------------------------------------
-            	//Se o erro antigo não existir, isNew = false
-            	//Para todos os casos que se abre apenas um ticket por check,
-            	//Só será Novo erro se o anterior for = "No Errors."
-            	//-----------------------------------------------------------
-            	if (!out.getOutput_error().contains("No Errors.")){
+                //-----------------------------------------------------------
+                //Se o erro antigo não existir, isNew = false
+                //Para todos os casos que se abre apenas um ticket por check,
+                //Só será Novo erro se o anterior for = "No Errors."
+                //-----------------------------------------------------------
+                if (!out.getOutput_error().contains("No Errors.")) {
                     isNew = false;
                     break;
                 }
@@ -203,56 +195,52 @@ public class ChecksExec {
         return isNew;
     }
 
-    //
     private List<String> arrCheckIsNewError(int checkID, int checkItemID, OBJCheckOutput err) {
-        
-    	List<String> lstNew = new ArrayList<String>();
+
+        List<String> lstNew = new ArrayList<String>();
 
         //Store just items of checkID and checkItemID...
         List<String> arrayItemLastErrors = new ArrayList<String>();
         //
         for (DBCheckOutput out : dbLastErrors.values()) {
-        	if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
-        		arrayItemLastErrors.add(out.getOutput_error());
+            if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
+                arrayItemLastErrors.add(out.getOutput_error());
             }
-        }        
+        }
         //
-        
+
         //Split err, for more than One... 
         String[] arrayMonErrors = err.getOutput_error().split("\n");
         //
 
         lstNew = arrNewErrors(arrayMonErrors, arrayItemLastErrors);
-        
+
         return lstNew;
     }
 
     // same as Arrays.equals()
     private List<String> arrNewErrors(String[] arr1, List<String> arr2) {
-    	
+
         //Store just items of checkID and checkItemID...
         List<String> arrayItemNewErrors = new ArrayList<String>(arr2);
         //
 
-        for (String s : arr1){
-        	if (arrayItemNewErrors.contains(s)){
-        		arrayItemNewErrors.remove(s);
-        	} else {
-        		arrayItemNewErrors.add(s);
-        	}
+        for (String s : arr1) {
+            if (arrayItemNewErrors.contains(s)) {
+                arrayItemNewErrors.remove(s);
+            } else {
+                arrayItemNewErrors.add(s);
+            }
         }
         //
-        for (String s : arr2){
-        	if (arrayItemNewErrors.contains(s)){
-        		arrayItemNewErrors.remove(s);
-        	}
+        for (String s : arr2) {
+            if (arrayItemNewErrors.contains(s)) {
+                arrayItemNewErrors.remove(s);
+            }
         }
-        
+
         return arrayItemNewErrors;
-    }    
+    }  
     //MPS - fim...
     //==============================================================================
-    
-    
-    
 }

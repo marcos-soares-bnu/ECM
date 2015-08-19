@@ -1,6 +1,7 @@
 package database;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -112,5 +113,14 @@ public class DBUtil {
             e.printStackTrace();
         }
         return strExec;
+    }
+
+    public void doINSERT(PreparedStatement pstmt) {
+        try {
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e);
+        }
     }
 }
