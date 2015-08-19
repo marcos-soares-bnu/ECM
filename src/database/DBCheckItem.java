@@ -13,7 +13,6 @@ public class DBCheckItem {
     private int id;
     private int check_id;
     private String item_name;
-    private int item_priority;
 
     private Map<Integer, OBJCheckItem> itens;
 
@@ -47,14 +46,6 @@ public class DBCheckItem {
         this.item_name = item_name;
     }
 
-    public int getItem_priority() {
-        return item_priority;
-    }
-
-    public void setItem_priority(int item_priority) {
-        this.item_priority = item_priority;
-    }
-
     public Map<Integer, OBJCheckItem> getItens() {
         return itens;
     }
@@ -74,9 +65,8 @@ public class DBCheckItem {
                 while (rs.next()) {
                     int id = rs.getInt("id");
                     String itemName = rs.getString("item_name");
-                    int prio = rs.getInt("item_priority");
                     
-                    OBJCheckItem item = new OBJCheckItem(id, this.check_id, itemName, prio);
+                    OBJCheckItem item = new OBJCheckItem(id, this.check_id, itemName);
                     
                     itens.put(itens.size()+1, item);
                 }

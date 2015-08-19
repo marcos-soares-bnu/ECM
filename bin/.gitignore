@@ -1,5 +1,6 @@
 <<<<<<< HEAD
 /RunOTASS.class
+<<<<<<< HEAD
 /change
 /database
 /logic_process
@@ -14,3 +15,12 @@
 /database/
 /test.class
 >>>>>>> refs/heads/vvv_work
+=======
+/change/
+/database/
+/logic_process/
+/main/
+/object/
+/text/
+/util/
+>>>>>>> refs/remotes/origin/rut_work

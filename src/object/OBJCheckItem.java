@@ -8,16 +8,14 @@ public class OBJCheckItem {
     private int id;
     private int check_id;
     private String itemName;
-    private int itemPrio;
     private String status;
 
     private Map<Integer, OBJCheckOutput> errors;
 
-    public OBJCheckItem(int id, int check_id, String itemName, int itemPrio) {
+    public OBJCheckItem(int id, int check_id, String itemName) {
         this.id = id;
         this.check_id = check_id;
         this.itemName = itemName;
-        this.itemPrio = itemPrio;
         this.status = "OK";
 
         this.errors = new HashMap<Integer, OBJCheckOutput>();
@@ -45,14 +43,6 @@ public class OBJCheckItem {
 
     public void setItemName(String itemName) {
         this.itemName = itemName;
-    }
-
-    public int getItemPrio() {
-        return itemPrio;
-    }
-
-    public void setItemPrio(int itemPrio) {
-        this.itemPrio = itemPrio;
     }
 
     public String getStatus() {
