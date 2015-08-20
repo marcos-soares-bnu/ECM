@@ -75,7 +75,7 @@ public class ChecksExec {
                     dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_sql.log");
                     break;
                 case Constantes.DB_FCIR_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_fcir2.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_fcir.log");
                     break;
                 case Constantes.DB_PIXCORE_ID:
                     dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_pixcore.log");
@@ -121,69 +121,52 @@ public class ChecksExec {
                     String output = err.getOutput_error();
                     
                     //==============================================================================
-                    // MPS - ini...
+                    // MPS - start...
                     //
-                    //return list of New Erros and record on DB...
-                    List<String> arrayItemLastErrors = new ArrayList<String>();                    
-                    arrayItemLastErrors = this.arrCheckIsNewError(checkID, checkItemID, err);
                     //******************************************************************************
                     //Test Hard-code items set to more than 1 ticket/error line
                     //******************************************************************************
-                    if	(	cItem.getItemName().equals("MON018")	|| cItem.getItemName().equals("MON019") 	||
-                            cItem.getItemName().equals("MON020")	|| cItem.getItemName().equals("OTASS012") 	||
-                       		cItem.getItemName().equals("OTASS013") 	|| cItem.getItemName().equals("DPWIN002")	){
-                        //Insert in DB with flag is_new = 1...
-                        for (String serr : arrayItemLastErrors) {
-                            //Create the error output
-                            DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, serr, exec_time, 1); //isNew);
-                            //grava as informações contidas no objCheck no banco
-                            dbOutput.DB_store();
-                        }
-                    	//
-                    	//Insert in DB with flag is_new = 0...
-                        for (DBCheckOutput out : dbLastErrors.values()) {
-                        	if ( (!out.getOutput_error().equals("No Errors.")) && (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) ) {
-                        		//Create the error output
-                                DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, out.getOutput_error(), exec_time, 0); //isNew);
-                                //grava as informações contidas no objCheck no banco
-                                dbOutput.DB_store();
-                        	}
-                        }        
+                    if (cItem.getItemName().equals("MON018") || cItem.getItemName().equals("MON019") || cItem.getItemName().equals("MON020")){
+
+                        //record list of New Errors/Exists on DB...
+                        this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
+                    }
+                    else if	(cItem.getItemName().equals("OTASS012") || cItem.getItemName().equals("OTASS013")){
+
+                    	//Check Details...
+                    }
+                    else if (cItem.getItemName().equals("DPWIN001") || cItem.getItemName().equals("DPWIN002")){
+
+                    	//Check Details...
                     }
                     else{
                     	int isNew = this.checkIsNewError(checkID, checkItemID, err) ? 1 : 0;                    	
-                        //Create the error output
+                    	//Create the error output
+                    	//Record objCheck information on DB...
                         DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, output, exec_time, isNew);
-                        //grava as informações contidas no objCheck no banco
                         dbOutput.DB_store();
                     }
-                    // MPS - fim...
+                    // MPS - end...
                     //==============================================================================
                 }
             } else {
                 String output = "No Errors.";
-                //Create the ok output
+            	//Create the error output
+            	//Record objCheck information on DB...
                 DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, output, exec_time);
-                //grava as informações contidas no objCheck no banco
                 dbOutput.DB_store();
             }
         }
     }
 
     //==============================================================================
-    // MPS - ini...
+    // MPS - start...
     private boolean checkIsNewError(int checkID, int checkItemID, OBJCheckOutput err) {
         boolean isNew = true;
         for (DBCheckOutput out : dbLastErrors.values()) {
             if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
-                //Encontrou o item correto
 
-                //Verifica se é o mesmo erro
                 //if (out.getOutput_error().equalsIgnoreCase(err.getOutput_error())) {
-                //-----------------------------------------------------------
-                //Se o erro antigo não existir, isNew = false
-                //Para todos os casos que se abre apenas um ticket por check,
-                //Só será Novo erro se o anterior for = "No Errors."
                 //-----------------------------------------------------------
                 if (!out.getOutput_error().contains("No Errors.")) {
                     isNew = false;
@@ -194,52 +177,42 @@ public class ChecksExec {
         return isNew;
     }
 
-    private List<String> arrCheckIsNewError(int checkID, int checkItemID, OBJCheckOutput err) {
+    private void recordArrCheckIsNewError(int checkID, int checkItemID, OBJCheckOutput err, Date exec_time, String status) {
 
-        List<String> lstNew = new ArrayList<String>();
+    	//Store items of Log file...
+        String[] arrayMonErrors = err.getOutput_error().split("\n");
 
-        //Store just items of checkID and checkItemID...
+    	//Store just items of checkID and checkItemID...
         List<String> arrayItemLastErrors = new ArrayList<String>();
-        //
+
         for (DBCheckOutput out : dbLastErrors.values()) {
             if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
                 arrayItemLastErrors.add(out.getOutput_error());
             }
         }
-        //
 
-        //Split err, for more than One... 
-        String[] arrayMonErrors = err.getOutput_error().split("\n");
-        //
+        for (String s : arrayMonErrors) {
 
-        lstNew = arrNewErrors(arrayMonErrors, arrayItemLastErrors);
-
-        return lstNew;
-    }
-
-    // same as Arrays.equals()
-    private List<String> arrNewErrors(String[] arr1, List<String> arr2) {
-
-        //Store just items of checkID and checkItemID...
-        List<String> arrayItemNewErrors = new ArrayList<String>(arr2);
-        //
-
-        for (String s : arr1) {
-            if (arrayItemNewErrors.contains(s)) {
-                arrayItemNewErrors.remove(s);
+        	//=================================================================
+        	//If CheckID = 1 (Infra), compare partName, else s
+        	//=================================================================
+        	String partName;
+        	if (checkID == 1)
+        		partName = s.substring(0, s.indexOf(" "));
+        	else
+        		partName = s;
+        	//
+        	//Create the error output
+        	//Record objCheck information on DB...
+            if (arrayItemLastErrors.contains(partName)) {
+            	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 0); //isNew=0);
+            	dbOutput.DB_store();
             } else {
-                arrayItemNewErrors.add(s);
+            	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 1); //isNew=1);
+            	dbOutput.DB_store();
             }
         }
-        //
-        for (String s : arr2) {
-            if (arrayItemNewErrors.contains(s)) {
-                arrayItemNewErrors.remove(s);
-            }
-        }
-
-        return arrayItemNewErrors;
     }  
-    //MPS - fim...
+    //MPS - end...
     //==============================================================================
 }
