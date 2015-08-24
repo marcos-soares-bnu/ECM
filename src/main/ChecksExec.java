@@ -182,7 +182,8 @@ public class ChecksExec {
     private void recordArrCheckIsNewError(int checkID, int checkItemID, OBJCheckOutput err, Date exec_time, String status) {
 
     	//Store items of Log file...
-        String[] arrayMonErrors = err.getOutput_error().split("\n");
+    	String aux_err = err.getOutput_error().replace("\n ","\n");
+        String[] arrayMonErrors = aux_err.split("\n");
 
     	//Store just items of checkID and checkItemID...
         List<String> arrayItemLastErrors = new ArrayList<String>();
@@ -192,7 +193,16 @@ public class ChecksExec {
         for (DBCheckOutput out : dbLastErrors.values()) {
             if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
                 arrayItemLastErrors_fullName.add(out.getOutput_error());
-                arrayItemLastErrors_partName.add(out.getOutput_error().substring(0, out.getOutput_error().indexOf(" ")));
+                
+                //==========================================================
+                //
+                int indSpc = out.getOutput_error().indexOf(" ");
+                
+                if (indSpc > 0)
+                	arrayItemLastErrors_partName.add(out.getOutput_error().substring(0, indSpc));
+                else
+                	arrayItemLastErrors_partName.add(out.getOutput_error());
+                //==========================================================
             }
         }
 
@@ -204,6 +214,10 @@ public class ChecksExec {
         	String partName;
         	if (checkID == 1){
         		partName = s.substring(0, s.indexOf(" "));
+        		arrayItemLastErrors = arrayItemLastErrors_partName;
+        	}
+        	else if (checkID == 3){
+        		partName = s.substring(0, s.indexOf("("));
         		arrayItemLastErrors = arrayItemLastErrors_partName;
         	}
         	else{
@@ -296,7 +310,7 @@ public class ChecksExec {
     	//--------------------------------------------------
     	//Remove Duplicate Erros e add to List...
         List<String> lst = new ArrayList<String>();
-        lst = arrRemoveDuplicateItems(arrayMonErrorsLogicSW);
+        lst = arrCountDuplicateItems(arrayMonErrorsLogicSW);
     	for (String s : lst) {
     		//
     		if (s.length() > 0){
@@ -307,7 +321,7 @@ public class ChecksExec {
     	//--------------------------------------------------
     	//record list of New Errors on DB...
     	//
-    	String aux_err = arrayMonErrorsTasksCheck.toString().replace(", ","").replace("[", "").replace("]", "");
+    	String aux_err = arrayMonErrorsTasksCheck.toString().replace("\n ", "\n").replace(",","").replace("[", "").replace("]", "");
     	//
     	OBJCheckOutput outerr = new OBJCheckOutput(aux_err);
         this.recordArrCheckIsNewError(checkID, checkItemID, outerr, exec_time, status);
@@ -349,7 +363,7 @@ public class ChecksExec {
         		//
         		lst.remove(lst.lastIndexOf(s));
         		//
-        		lst.add(lst.lastIndexOf(s) + "(" + indDup + ")");
+        		lst.add(s + " (" + indDup + ")");
         	}
         }        
 
