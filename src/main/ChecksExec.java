@@ -2,6 +2,7 @@ package main;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -137,7 +138,8 @@ public class ChecksExec {
                     }
                     else if (cItem.getItemName().equals("DPWIN001") || cItem.getItemName().equals("DPWIN002")){
 
-                    	//Check Details...
+                        //record list of New Errors/Exists on DB...
+                        this.recordArrCheckIsNewErrorTasks(checkID, checkItemID, err, exec_time, status);
                     }
                     else{
                     	int isNew = this.checkIsNewError(checkID, checkItemID, err) ? 1 : 0;                    	
@@ -184,10 +186,13 @@ public class ChecksExec {
 
     	//Store just items of checkID and checkItemID...
         List<String> arrayItemLastErrors = new ArrayList<String>();
+        List<String> arrayItemLastErrors_fullName = new ArrayList<String>();
+        List<String> arrayItemLastErrors_partName = new ArrayList<String>();
 
         for (DBCheckOutput out : dbLastErrors.values()) {
             if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
-                arrayItemLastErrors.add(out.getOutput_error());
+                arrayItemLastErrors_fullName.add(out.getOutput_error());
+                arrayItemLastErrors_partName.add(out.getOutput_error().substring(0, out.getOutput_error().indexOf(" ")));
             }
         }
 
@@ -197,10 +202,14 @@ public class ChecksExec {
         	//If CheckID = 1 (Infra), compare partName, else s
         	//=================================================================
         	String partName;
-        	if (checkID == 1)
+        	if (checkID == 1){
         		partName = s.substring(0, s.indexOf(" "));
-        	else
+        		arrayItemLastErrors = arrayItemLastErrors_partName;
+        	}
+        	else{
         		partName = s;
+        		arrayItemLastErrors = arrayItemLastErrors_fullName;
+        	}
         	//
         	//Create the error output
         	//Record objCheck information on DB...
@@ -212,7 +221,142 @@ public class ChecksExec {
             	dbOutput.DB_store();
             }
         }
+    }
+    
+    //MPS - logic TASKS...
+    private void recordArrCheckIsNewErrorTasks(int checkID, int checkItemID, OBJCheckOutput err, Date exec_time, String status) {
+
+    	List<String> arrayMonErrorsTasksCheck = new ArrayList<String>();
+    	List<String> arrayMonErrorsTasks;
+    	List<String> arrayMonErrorsLogicSW;
+    	
+    	//Check if exists STRING_LOGICSWITCH...
+    	int indLOGIC = 0;
+    	int indLOGICLEN = 0;
+    	indLOGIC = err.getOutput_error().indexOf(Constantes.STRING_LOGICSWITCH);
+    	indLOGICLEN = indLOGIC + Constantes.STRING_LOGICSWITCH.length();
+    	
+    	//Store items of Log file...
+    	if (indLOGIC > 0){
+
+    		arrayMonErrorsTasks = Arrays.asList(err.getOutput_error().substring(0, indLOGIC).split("TaskName:"));
+    		arrayMonErrorsLogicSW = Arrays.asList(err.getOutput_error().substring(indLOGICLEN).split("\n"));
+    	}
+    	else{
+
+    		arrayMonErrorsTasks = Arrays.asList(err.getOutput_error().split("TaskName:"));
+    		arrayMonErrorsLogicSW = null;
+    	}
+    	
+    	//Clean spaces and set new string to tasks list...
+    	int lenState = Constantes.STRING_TKSTAT.length();
+    	int lenResult = Constantes.STRING_TKLRES.length();
+    	int indResult = 0;
+    	int indState = 0;
+    	String tmpState = "";
+    	String tmpResult = "";
+    	//
+    	for (String s : arrayMonErrorsTasks) {
+
+    		if (s.length() > 0){
+    			//
+    			indResult = s.indexOf(Constantes.STRING_TKLRES);
+    			indState = s.indexOf(Constantes.STRING_TKSTAT);
+    			
+    			if ((indResult > 0) && (indState > 0)){
+	    			//
+	    	    	tmpResult = s.substring(indResult+lenResult, indState);
+	    	    	tmpState = s.substring(indState+lenState).replace("\n","");
+	    			//
+	    			s = s.replace(Constantes.STRING_TKNRUN, "(");
+	    			s = s.replace(Constantes.STRING_TKLRUN, ")(");
+	    			s = s.replace(Constantes.STRING_TKLRES, ")(");
+	    			s = s.replace(Constantes.STRING_TKSTAT, ")(");
+	    			s = s.replace(" ", "");
+	    			s = s.replace("\n", "");
+	    			//
+	    			//------------------------------------
+	    			//Check if Last Result and Task State 
+	    			//exists and diff (0 && 267009) and 
+	    			//diff (Enabled)
+	    			if (tmpState.trim().toUpperCase().equals("ENABLED")){
+	
+	    				if	(	( !tmpResult.trim().equals("0") ) && ( !tmpResult.trim().equals("267009") ) ){
+	
+	    	    			arrayMonErrorsTasksCheck.add(s + ")\n");
+	    				}
+	    			}
+	    			else{
+	    				
+		    			arrayMonErrorsTasksCheck.add(s + ")\n");
+	    			}
+    			}
+    		}
+		}
+    	//--------------------------------------------------
+    	//Remove Duplicate Erros e add to List...
+        List<String> lst = new ArrayList<String>();
+        lst = arrRemoveDuplicateItems(arrayMonErrorsLogicSW);
+    	for (String s : lst) {
+    		//
+    		if (s.length() > 0){
+    			arrayMonErrorsTasksCheck.add(s + "\n");
+    		}
+    	}
+
+    	//--------------------------------------------------
+    	//record list of New Errors on DB...
+    	//
+    	String aux_err = arrayMonErrorsTasksCheck.toString().replace(", ","").replace("[", "").replace("]", "");
+    	//
+    	OBJCheckOutput outerr = new OBJCheckOutput(aux_err);
+        this.recordArrCheckIsNewError(checkID, checkItemID, outerr, exec_time, status);
+        
+    }
+
+    
+    //===========================================================================
+    // Remove Duplicated Items...
+    //===========================================================================
+    private List<String> arrRemoveDuplicateItems(List<String> arr1) {
+
+        List<String> lst = new ArrayList<String>(arr1);
+        //
+        Object[] st = lst.toArray();
+        for (Object s : st) {
+        	if (lst.indexOf(s) != lst.lastIndexOf(s)) {
+        		lst.remove(lst.lastIndexOf(s));
+        	}
+        }        
+
+        return lst;
     }  
+    
+
+    //===========================================================================
+    // Remove e COUNT Duplicated Items... 25/8/2015 - by MPS
+    //===========================================================================
+    private List<String> arrCountDuplicateItems(List<String> arr1) {
+
+    	int indDup = 0;
+        List<String> lst = new ArrayList<String>(arr1);
+        //
+        Object[] st = lst.toArray();
+        for (Object s : st) {
+        	if (lst.indexOf(s) != lst.lastIndexOf(s)) {
+        		//
+        		indDup++;
+        		//
+        		lst.remove(lst.lastIndexOf(s));
+        		//
+        		lst.add(lst.lastIndexOf(s) + "(" + indDup + ")");
+        	}
+        }        
+
+        return lst;
+    }  
+    
+    
     //MPS - end...
     //==============================================================================
 }

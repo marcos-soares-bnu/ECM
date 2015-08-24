@@ -21,6 +21,13 @@ public class Constantes {
     public static final String STRING_ERRORS = "----------------------ERRORS------------------------------";
     public static final String STRING_CONFIG = "----------------------CONFIG------------------------------";
     public static final String STRING_SUBERROR = "---------------------SUBERROR-----------------------------";
+    public static final String STRING_LOGICSWITCH = "------------------LOGIC-SWITCH----------------------------";
+    
+    //Task Schedules const
+    public static final String STRING_TKNRUN = "\nNext Run Time:";
+    public static final String STRING_TKLRUN = "\nLast Run Time:";
+    public static final String STRING_TKLRES = "\nLast Result:";
+    public static final String STRING_TKSTAT = "\nScheduled Task State:";
     
     //Testing reasons
     public static final boolean LINDE_ENVIRONMENT = false;
