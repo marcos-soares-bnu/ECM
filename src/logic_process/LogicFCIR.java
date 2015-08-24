@@ -21,7 +21,7 @@ public class LogicFCIR extends Logic {
 
         //pos 0 = null
         for (int i = 1; i < files.length; i++) {
-            Date horaArquivo = dtUtil.getDateFromStringCHECKS(files[i]);
+            Date horaArquivo = dtUtil.getDateFromStringFCIRchecks(files[i]);
             Date plannedExecution = this.getPlannedExec(horaArquivo);
 
             long diff = dtUtil.getMinDif(horaArquivo, timeNOW);
@@ -102,9 +102,11 @@ public class LogicFCIR extends Logic {
         }
 
         Calendar gcPlanExec = this.getData(dtPlanExec);
-
+        //Se está no período em que o job não roda (somente em horas)
         if (dtPlanExec.getHours() < 7 || dtPlanExec.getHours() >= 20) {
+            //Se está na última hora possível para rodar (20 horas)
             if (dtPlanExec.getHours() == 20) {
+                //Se está com hora >= 20:52 (ultima execução do job no dia)
                 if (dtPlanExec.getMinutes() >= 52) {
                     execHour = 7;
                     execMin = 7;
@@ -119,18 +121,23 @@ public class LogicFCIR extends Logic {
                 }
             }
         }
-
+        //d1 = true: o arquivo é de domingo
         boolean d1 = dtUtil.getWeekDay(horaArquivo).equalsIgnoreCase("Sonntag");
         Date dtTemp = gcPlanExec.getTime();
+        //d2 = true: a dia atual é domingo
         boolean d2 = dtUtil.getWeekDay(dtTemp).equalsIgnoreCase("Sonntag");
         boolean domingo = (d1 || d2);
 
         if (domingo) {
+            //Se hoje é domingo, seta a execução planejada para o primeiro
+            //horário de segunda feira.
             if (d2) {
                 gcPlanExec.add(Calendar.DAY_OF_MONTH, 1);
                 gcPlanExec.set(Calendar.HOUR_OF_DAY, 07);
                 gcPlanExec.set(Calendar.MINUTE, 07);
                 dtTemp = gcPlanExec.getTime();
+                dtPlanExec = dtTemp;
+            //Senão     
             } else {
                 dtTemp = gcPlanExec.getTime();
                 dtTemp.setHours(execHour);

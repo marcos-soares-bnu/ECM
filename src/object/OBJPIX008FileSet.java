@@ -45,14 +45,14 @@ public class OBJPIX008FileSet {
     public void setScaFile(String scaFile) {
         this.scaFile = scaFile;
     }
-
+    //PIX008 retorna as datas no mesmo formato que DPWIN007.
     public Date getDirDate() {
-        Date dirDate = dtUtil.getFileDatePIX(this.getDirectory());
+        Date dirDate = dtUtil.getFileDateDPWIN007(this.getDirectory());    
         return dirDate;
     }
     
     public boolean hasDir() {
-        return !this.getDirectory().isEmpty();
+        return !(this.getDirectory() == null);
     }
     
     public boolean isDirOlderThan8h(Date timeNow) {

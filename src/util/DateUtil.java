@@ -56,6 +56,16 @@ public class DateUtil {
         return dt;
     }
 
+    public Date getFileDateFromStringPIXCORE(String s) {
+        Date dt = null;
+        try {
+            dt = (Date) sdfFilesPix.parse(s);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return dt;
+    }
+
     public long getHoursDif(Date d1, Date d2) {
         long dif = 0;
 
@@ -129,15 +139,28 @@ public class DateUtil {
     }
 
     /**
-     * Used by FCIR003 and PIX005
+     * Used by FCIR003
      * 
      * @param fileInfo
      * @return
      */
-    public Date getDateFromStringCHECKS(String fileInfo) {
+    public Date getDateFromStringFCIRchecks(String fileInfo) {
         String[] str = fileInfo.split(" ");
         String strDtFull = str[0] + " " + str[2] + " " + str[3];
         Date dt = (Date) this.getFileDateFromString(strDtFull);
+        return dt;
+    }
+    
+    /**
+     * Used by PIX005
+     * 
+     * @param fileInfo
+     * @return
+     */
+    public Date getDateFromStringPIXCOREchecks(String fileInfo) {
+        String[] str = fileInfo.split(" ");
+        String strDtFull = str[0] + " " + str[1] + " " + str[2];
+        Date dt = (Date) this.getFileDateFromStringPIXCORE(strDtFull);
         return dt;
     }
 
@@ -166,15 +189,15 @@ public class DateUtil {
     }
 
     /**
-     * Used by: PIX007, PIX009, PIX010 //Talvez , PIX011, PIX012
+     * Used by: PIX005, PIX007, PIX009, PIX010
      * 
      * @param fileInfo
      * @return
      */
     public Date getFileDatePIX(String fileInfo) {
-        String[] str = fileInfo.split("    ");
-        Date dt = (Date) this.getFileDateFromString(str[0]);
-        return dt;
+      String[] str = fileInfo.split("    ");
+      Date dt = (Date) this.getFileDateFromStringPIXCORE(str[0]);
+      return dt;
     }
 
     public long getMinDif(Date d1, Date d2) {
