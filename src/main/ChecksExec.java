@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -271,6 +270,7 @@ public class ChecksExec {
     	List<String> arrayMonErrorsLogicSW;
     	
     	//Check if exists STRING_LOGICSWITCH...
+    	boolean isNullLOGIC = false;
     	int indLOGIC = 0;
     	int indLOGICLEN = 0;
     	indLOGIC = err.getOutput_error().indexOf(Constantes.STRING_LOGICSWITCH);
@@ -286,6 +286,7 @@ public class ChecksExec {
 
     		arrayMonErrorsTasks = Arrays.asList(err.getOutput_error().split("TaskName:"));
     		arrayMonErrorsLogicSW = null;
+        	isNullLOGIC = true;
     	}
     	
     	//Clean spaces and set new string to tasks list...
@@ -336,13 +337,17 @@ public class ChecksExec {
     	//--------------------------------------------------
     	//Remove Duplicate Erros e add to List...
         List<String> lst = new ArrayList<String>();
-        lst = arrCountDuplicateItems(arrayMonErrorsLogicSW);
-    	for (String s : lst) {
-    		//
-    		if (s.length() > 0){
-    			arrayMonErrorsTasksCheck.add(s + "\n");
-    		}
-    	}
+        
+        //Test if arrayMonErrorsLogicSW is null...
+        if (!isNullLOGIC){
+	        lst = arrCountDuplicateItems(arrayMonErrorsLogicSW);
+	    	for (String s : lst) {
+	    		//
+	    		if (s.length() > 0){
+	    			arrayMonErrorsTasksCheck.add(s + "\n");
+	    		}
+	    	}
+        }
 
     	//--------------------------------------------------
     	//record list of New Errors on DB...
@@ -400,8 +405,6 @@ public class ChecksExec {
         //
         return lstCDup;
     }  
-    
-    
     
     //MPS - end...
     //==============================================================================
