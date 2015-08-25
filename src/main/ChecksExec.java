@@ -4,8 +4,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.swing.JOptionPane;
 
@@ -134,7 +137,7 @@ public class ChecksExec {
                     }
                     else if	(cItem.getItemName().equals("OTASS012") || cItem.getItemName().equals("OTASS013")){
 
-                    	//Check Details...
+                    	//To be Implemented...
                     }
                     else if (cItem.getItemName().equals("DPWIN001") || cItem.getItemName().equals("DPWIN002")){
 
@@ -183,7 +186,7 @@ public class ChecksExec {
 
     	//Store items of Log file...
     	String aux_err = err.getOutput_error().replace("\n ","\n");
-        String[] arrayMonErrors = aux_err.split("\n");
+    	String[] arrayMonErrors = aux_err.split("\n");
 
     	//Store just items of checkID and checkItemID...
         List<String> arrayItemLastErrors = new ArrayList<String>();
@@ -197,43 +200,66 @@ public class ChecksExec {
                 //==========================================================
                 //
                 int indSpc = out.getOutput_error().indexOf(" ");
+                int indTsk = out.getOutput_error().indexOf("(");
                 
-                if (indSpc > 0)
+                if ( (indSpc > 0) && (checkID == 1))
                 	arrayItemLastErrors_partName.add(out.getOutput_error().substring(0, indSpc));
+                else if ( (indTsk > 0) && (checkID == 3))
+                	arrayItemLastErrors_partName.add(out.getOutput_error().substring(0, indTsk));
                 else
                 	arrayItemLastErrors_partName.add(out.getOutput_error());
                 //==========================================================
             }
         }
 
-        for (String s : arrayMonErrors) {
-
-        	//=================================================================
-        	//If CheckID = 1 (Infra), compare partName, else s
-        	//=================================================================
-        	String partName;
-        	if (checkID == 1){
-        		partName = s.substring(0, s.indexOf(" "));
-        		arrayItemLastErrors = arrayItemLastErrors_partName;
-        	}
-        	else if (checkID == 3){
-        		partName = s.substring(0, s.indexOf("("));
-        		arrayItemLastErrors = arrayItemLastErrors_partName;
-        	}
-        	else{
-        		partName = s;
-        		arrayItemLastErrors = arrayItemLastErrors_fullName;
-        	}
+        //Test if aux_err is empty...
+        if (aux_err.length() > 0){
         	//
-        	//Create the error output
-        	//Record objCheck information on DB...
-            if (arrayItemLastErrors.contains(partName)) {
-            	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 0); //isNew=0);
-            	dbOutput.DB_store();
-            } else {
-            	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 1); //isNew=1);
-            	dbOutput.DB_store();
-            }
+	        for (String s : arrayMonErrors) {
+	        	//
+	        	int indSpc = s.indexOf(" ");
+	        	int indTsk = s.indexOf("(");
+	        	
+	        	//======================================================================
+	        	//If CheckID = 1 (INFRA), CheckID = 3 (DPWIN), compare partName, else s
+	        	//======================================================================
+	        	String partName;
+	        	if (checkID == 1){
+	        		if (indSpc > 0)
+	        			partName = s.substring(0, indSpc);
+	        		else
+	        			partName = s;
+	        		//
+	        		arrayItemLastErrors = arrayItemLastErrors_partName;
+	        	}
+	        	else if (checkID == 3){
+	        		if (indTsk > 0)
+	        			partName = s.substring(0, indTsk);
+	        		else
+	        			partName = s;
+	        		//
+	        		arrayItemLastErrors = arrayItemLastErrors_partName;
+	        	}
+	        	else{
+	        		partName = s;
+	        		arrayItemLastErrors = arrayItemLastErrors_fullName;
+	        	}
+	        	//
+	        	//Create the error output
+	        	//Record objCheck information on DB...
+	            if (arrayItemLastErrors.contains(partName)) {
+	            	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 0); //isNew=0);
+	            	dbOutput.DB_store();
+	            } else {
+	            	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 1); //isNew=1);
+	            	dbOutput.DB_store();
+	            }
+	        }
+        }
+        //If aux_err is empty, it means that search of tasks return no errors...
+        else {
+        	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, "OK", "No Errors.", exec_time, 0); //isNew=0);
+        	dbOutput.DB_store();
         }
     }
     
@@ -336,13 +362,11 @@ public class ChecksExec {
 
         List<String> lst = new ArrayList<String>(arr1);
         //
-        Object[] st = lst.toArray();
-        for (Object s : st) {
-        	if (lst.indexOf(s) != lst.lastIndexOf(s)) {
-        		lst.remove(lst.lastIndexOf(s));
-        	}
-        }        
-
+        Set<String> set = new HashSet<String>();
+        set.addAll(lst);
+        lst.clear();
+        lst.addAll(set);
+        
         return lst;
     }  
     
@@ -354,21 +378,29 @@ public class ChecksExec {
 
     	int indDup = 0;
         List<String> lst = new ArrayList<String>(arr1);
+        List<String> lstNDup = arrRemoveDuplicateItems(lst);
+        List<String> lstDup = new ArrayList<String>(lst);
+        List<String> lstCDup = new ArrayList<String>();
         //
-        Object[] st = lst.toArray();
-        for (Object s : st) {
-        	if (lst.indexOf(s) != lst.lastIndexOf(s)) {
-        		//
-        		indDup++;
-        		//
-        		lst.remove(lst.lastIndexOf(s));
-        		//
-        		lst.add(s + " (" + indDup + ")");
+        for (Object s : lstNDup) {
+        	if (lstDup.contains(s)){
+        		lstDup.remove(s);
         	}
-        }        
-
-        return lst;
+        }
+        //
+        for (Object s : lstDup) {
+        	indDup++;
+        	lstCDup.add(s + " - " + indDup);
+        }
+        //
+        for (Object s : lstNDup) {
+        	if (s.toString().length() > 0)
+        		lstCDup.add(s.toString());
+        }
+        //
+        return lstCDup;
     }  
+    
     
     
     //MPS - end...
