@@ -72,7 +72,7 @@ public class LogicPixCore extends Logic {
         String inProcessing = "01/02/1980  02:00 AM";
         Date inProcessingDt = dtUtil.getFileDateFromString(inProcessing);
         for (int i = 1; i < pendingFiles.length; i++) {
-            Date fileDt = dtUtil.getFileDatePIX(pendingFiles[i]);
+        	Date fileDt = dtUtil.getFileDateFromString(pendingFiles[i]);
             if (!inProcessingDt.equals(fileDt)) {
                 long timeDif = dtUtil.getHoursDif(fileDt, taskLastRun);
                 if (timeDif >= 1) {
