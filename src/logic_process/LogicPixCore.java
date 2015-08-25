@@ -17,16 +17,16 @@ public class LogicPixCore extends Logic {
         String[] arrProcess = checkInfos.getError().split("\n");
         
         String strProcExport = arrProcess[1];
-        Date epxProcDate = dtUtil.getDateFromStringCHECKS(strProcExport);
+        Date epxProcDate = dtUtil.getDateFromStringPIXCOREchecks(strProcExport);
         long diffExp = dtUtil.getMinDif(dateNOW, epxProcDate);
         String strProcImport = arrProcess[2];
-        Date impProcDate = dtUtil.getDateFromStringCHECKS(strProcImport);
+        Date impProcDate = dtUtil.getDateFromStringPIXCOREchecks(strProcImport);
         long diffImp = dtUtil.getMinDif(dateNOW, impProcDate);
         String strProcReco = arrProcess[3];
-        Date recoProcDate = dtUtil.getDateFromStringCHECKS(strProcReco);
+        Date recoProcDate = dtUtil.getDateFromStringPIXCOREchecks(strProcReco);
         long diffReco = dtUtil.getMinDif(dateNOW, recoProcDate);
         String strProcDelete = arrProcess[4];
-        Date delProcDate = dtUtil.getDateFromStringCHECKS(strProcDelete);
+        Date delProcDate = dtUtil.getDateFromStringPIXCOREchecks(strProcDelete);
         long diffDel = dtUtil.getMinDif(dateNOW, delProcDate);
         
         String error = "";
@@ -177,17 +177,16 @@ public class LogicPixCore extends Logic {
             checkInfos.setError(completeError);
         }
     }
-    
+    //Used by PIX011 and PIX012
     public void PIXTransJOB(TXTCheck checkInfos, Date dateNOW) {
         Map<Integer, String> errorsMap = new HashMap<Integer, String>();
         
         String[] filesAndLastFile = checkInfos.getError().split("LASTFILE:");
         String[] files = filesAndLastFile[0].split("\n");
-        @SuppressWarnings("unused")
-        String lastFile = filesAndLastFile[1].replace("\n", "");
         
         for (int i = 1; i < files.length; i++) {
-            Date dtArquivo = dtUtil.getFileDatePIX(files[i]);
+            //PIX011 e PIX012 tem mesmo formato de data do DPWIN007.
+            Date dtArquivo = dtUtil.getFileDateDPWIN007(files[i]);
             Date dtPlan = this.getPlannedExec(dtArquivo, checkInfos.getNomeCheck());
             
             //Se for depois, irá ser executado ainda
