@@ -66,26 +66,17 @@ public class LogicPixCore extends Logic {
         String[] pendingFiles = filesAndLastFile[0].split("\n");
         
         
-        //Check1:
-        //Se a hora do arquivo - hora ultima exec >= 1h == ERRO!
-        //OBS: 01/02/1980  02:00 AM == Em processamento / Ignorar arquivo
-        String inProcessing = "01/02/1980  02:00 AM";
-        Date inProcessingDt = dtUtil.getFileDateFromString(inProcessing);
-        for (int i = 1; i < pendingFiles.length; i++) {
-        	Date fileDt = dtUtil.getFileDateFromString(pendingFiles[i]);
-            if (!inProcessingDt.equals(fileDt)) {
-                long timeDif = dtUtil.getHoursDif(fileDt, taskLastRun);
-                if (timeDif >= 1) {
-                    errorsMap.put(errorsMap.size(), pendingFiles[i]);
-                }
-            }
-        }
+        //=====================================================================
+        //MPS - start - 26/08/2015
+        //
+        boolean flgTask = false;
         
         //Check2:
         //task state = enabled == OK
         //task state != enabled == NOK!
         if (!taskState.equalsIgnoreCase("Enabled")) {
             errorsMap.put(errorsMap.size(), "Task status is not \'Enabled\', is: " + taskState);
+            flgTask = true;
         }
         
         //Check3:
@@ -95,14 +86,40 @@ public class LogicPixCore extends Logic {
         //Diferente dessas 3 = NOK!
         if (taskLastResult.equalsIgnoreCase("15")) {
             //Situação normal de overload
+        	flgTask = true;
+        	
         } else if (taskLastResult.equalsIgnoreCase("267009")) {
             //Task rodando
+        	flgTask = true;
+        	
         } else if (taskLastResult.equalsIgnoreCase("0")) {
             //OK
+        	flgTask = true;
+        	
         } else {
             //Erro
             errorsMap.put(errorsMap.size(), "Task Last Result is not OK. Last Result: " + taskLastResult);
         }
+
+        if (!flgTask){
+	        //Check1:
+	        //Se a hora do arquivo - hora ultima exec >= 1h == ERRO!
+	        //OBS: 01/02/1980  02:00 AM == Em processamento / Ignorar arquivo
+	        String inProcessing = "01/02/1980  02:00 AM";
+	        Date inProcessingDt = dtUtil.getFileDateFromString(inProcessing);
+	        for (int i = 1; i < pendingFiles.length; i++) {
+	        	Date fileDt = dtUtil.getFileDateFromString(pendingFiles[i]);
+	            if (!inProcessingDt.equals(fileDt)) {
+	                long timeDif = dtUtil.getHoursDif(fileDt, taskLastRun);
+	                if (timeDif >= 1) {
+	                    errorsMap.put(errorsMap.size(), pendingFiles[i]);
+	                }
+	            }
+	        }
+        }
+        
+        //MPS - end
+        //=====================================================================
         
         //Caso3:
         //Last Entry in logfiles
