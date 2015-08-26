@@ -46,7 +46,7 @@ public class OBJPIXSchedTaskFileSet {
     
     public boolean isDirOlderThan1hLS(Date taskLastRun) {
         boolean isOlder = false;
-        long hDiff = dtUtil.getHoursDif(taskLastRun, this.getDirDate());
+        long hDiff = dtUtil.getHoursDif(this.getDirDate(), taskLastRun);
         if (hDiff > 1) {
             isOlder = true;
         }

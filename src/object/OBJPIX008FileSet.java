@@ -57,7 +57,7 @@ public class OBJPIX008FileSet {
     
     public boolean isDirOlderThan8h(Date timeNow) {
         boolean isOlder = false;
-        long hDiff = dtUtil.getHoursDif(timeNow, this.getDirDate());
+        long hDiff = dtUtil.getHoursDif(this.getDirDate(), timeNow);
         if (hDiff > 8) {
             isOlder = true;
         }
@@ -70,7 +70,7 @@ public class OBJPIX008FileSet {
         if (this.getImpFile() != null) {
             isMissing = false;
         } else {
-            long hDiff = dtUtil.getHoursDif(timeNow, this.getDirDate());
+            long hDiff = dtUtil.getHoursDif(this.getDirDate(), timeNow);
             if (hDiff > 1) {
                 isMissing = true;
             }
