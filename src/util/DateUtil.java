@@ -67,16 +67,7 @@ public class DateUtil {
     }
 
     public long getHoursDif(Date d1, Date d2) {
-        long dif = 0;
-
-        if (d1.after(d2)) {
-            //D2 maior
-            dif = (d1.getTime() - d2.getTime()) / 3600000;
-        } else {
-            //D1 maior
-            dif = (d2.getTime() - d1.getTime()) / 3600000;
-        }
-        return dif;
+        return (d2.getTime() - d1.getTime()) / 3600000;
     }
 
     public boolean moreThanXhours(Date nowDate, Date fileDate, int XHours) {
