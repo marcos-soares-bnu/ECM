@@ -279,12 +279,19 @@ public class ChecksExec {
     	//Store items of Log file...
     	if (indLOGIC > 0){
 
-    		arrayMonErrorsTasks = Arrays.asList(err.getOutput_error().substring(0, indLOGIC).split("TaskName:"));
-    		arrayMonErrorsLogicSW = Arrays.asList(err.getOutput_error().substring(indLOGICLEN).split("\n"));
+    		//MPS - ajuste quebras em 27/08/2015...
+    		String aux_err = "";
+    		aux_err = err.getOutput_error().substring(0, indLOGIC).replace(" \n", "\n");
+    		arrayMonErrorsTasks = Arrays.asList(aux_err.split("TaskName:"));
+    		aux_err = err.getOutput_error().substring(indLOGICLEN).replace(" \n", "\n");
+    		arrayMonErrorsLogicSW = Arrays.asList(aux_err.split("\n"));
     	}
     	else{
 
-    		arrayMonErrorsTasks = Arrays.asList(err.getOutput_error().split("TaskName:"));
+    		//MPS - ajuste quebras em 27/08/2015...
+    		String aux_err = "";
+    		aux_err = err.getOutput_error().replace(" \n", "\n");
+    		arrayMonErrorsTasks = Arrays.asList(aux_err.split("TaskName:"));
     		arrayMonErrorsLogicSW = null;
         	isNullLOGIC = true;
     	}
@@ -299,7 +306,8 @@ public class ChecksExec {
     	//
     	for (String s : arrayMonErrorsTasks) {
 
-    		if (s.length() > 0){
+    		//MPS - ajuste quebras em 27/08/2015...
+    		if (s.length() > 1){
     			//
     			indResult = s.indexOf(Constantes.STRING_TKLRES);
     			indState = s.indexOf(Constantes.STRING_TKSTAT);
