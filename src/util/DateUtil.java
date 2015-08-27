@@ -19,10 +19,8 @@ public class DateUtil {
     SimpleDateFormat sdfJustTime = new SimpleDateFormat("hh:mm a", Locale.GERMANY);
     SimpleDateFormat sdfJustHour = new SimpleDateFormat("HH", Locale.GERMANY);
     SimpleDateFormat sdfJustMinute = new SimpleDateFormat("mm", Locale.GERMANY);
-//FIXME verificar!
+
     public Date getDateFromString(String s) {
-//        ParsePosition pos = new ParsePosition(4);
-//        Date dt = (Date) sdfFiles.parse(s, pos);
         Date dt = null;
         try {
             dt = (Date) sdfFiles.parse(s);
