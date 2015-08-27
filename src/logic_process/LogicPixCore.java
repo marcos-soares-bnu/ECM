@@ -94,7 +94,7 @@ public class LogicPixCore extends Logic {
         	
         } else if (taskLastResult.equalsIgnoreCase("0")) {
             //OK
-        	flgTask = true;
+        	//flgTask = true; // It's necessary to check when Result = 0... MPS - 27/08/2015
         	
         } else {
             //Erro
