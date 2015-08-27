@@ -188,7 +188,7 @@ public class CheckHandler {
     
     private Date getDateNow(TXTCheck checkInfos) {
         String strdate = checkInfos.getConfig().replace("\n", " ");
-        strdate = strdate.substring(1);
+        strdate = strdate.trim().substring(4);
         Date dateNOW = dtUtil.getDateFromString(strdate);
         
         return dateNOW;
