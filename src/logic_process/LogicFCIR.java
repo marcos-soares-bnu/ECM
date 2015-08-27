@@ -24,7 +24,7 @@ public class LogicFCIR extends Logic {
             Date horaArquivo = dtUtil.getDateFromStringFCIRchecks(files[i]);
             Date plannedExecution = this.getPlannedExec(horaArquivo);
 
-            long diff = dtUtil.getMinDif(horaArquivo, timeNOW);
+            long diff = dtUtil.getMinDif(timeNOW, horaArquivo);
 
             if (timeNOW.after(plannedExecution)) {
                 if (diff > 30) {

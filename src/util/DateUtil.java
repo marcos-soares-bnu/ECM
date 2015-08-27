@@ -2,7 +2,6 @@ package util;
 
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -22,8 +21,12 @@ public class DateUtil {
     SimpleDateFormat sdfJustMinute = new SimpleDateFormat("mm", Locale.GERMANY);
 
     public Date getDateFromString(String s) {
-        ParsePosition pos = new ParsePosition(4);
-        Date dt = (Date) sdfFiles.parse(s, pos);
+        Date dt = null;
+        try {
+            dt = (Date) sdfFiles.parse(s);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
         return dt;
     }
 
@@ -193,13 +196,7 @@ public class DateUtil {
 
     public long getMinDif(Date d1, Date d2) {
         long diff = 0;
-
-        if (d1.getTime() > d2.getTime()) {
-            diff = d1.getTime() - d2.getTime();
-        } else {
-            diff = d2.getTime() - d1.getTime();
-        }
-
+        diff = d1.getTime() - d2.getTime();
         //diff em min:
         diff = diff / 1000 / 60;
 
