@@ -11,6 +11,7 @@ public class Constantes {
     
     //CheckScripts
     public static final int DB_INFRA_ID = 1;
+    public static final int DB_OTASS_ID = 2;
     public static final int DB_DPWIN_ID = 3;
     public static final int DB_SQL_ID = 4;
     public static final int DB_FCIR_ID = 5;

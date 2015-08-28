@@ -71,6 +71,9 @@ public class ChecksExec {
                 case Constantes.DB_INFRA_ID:
                     dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_infra.log");
                     break;
+                case Constantes.DB_OTASS_ID:
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_otass.log");
+                    break;
                 case Constantes.DB_DPWIN_ID:
                     dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_dpwin.log");
                     break;
@@ -134,9 +137,11 @@ public class ChecksExec {
                         //record list of New Errors/Exists on DB...
                         this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
                     }
-                    else if	(cItem.getItemName().equals("OTASS012") || cItem.getItemName().equals("OTASS013")){
-
-                    	//To be Implemented...
+                    else if	(cItem.getItemName().equals("OTASS012")){
+                        this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
+                    }
+                    else if (cItem.getItemName().equals("OTASS013")) {
+                        //TODO Under implementation - with tasks division
                     }
                     else if (cItem.getItemName().equals("DPWIN001") || cItem.getItemName().equals("DPWIN002")){
 

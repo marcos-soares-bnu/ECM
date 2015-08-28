@@ -60,7 +60,7 @@ public class DBCheckConfig {
                 e.printStackTrace();
             }
         } else {
-            System.err.println("Can't retrieve anything from database");
+            System.err.println("Check ID nonexistent. Can't retrieve anything from database.");
         }
     }
 }

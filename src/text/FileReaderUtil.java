@@ -8,16 +8,16 @@ import java.io.IOException;
 
 public class FileReaderUtil {
 
-    private File f;
-    private FileReader fr;
-    private BufferedReader br;
+    private File file;
+    private FileReader fileReader;
+    private BufferedReader bufferedReader;
 
     public FileReaderUtil(String file) {
-        setF(new File(file));
-        if (this.getF().exists()) {
+        setFile(new File(file));
+        if (this.getFile().exists()) {
             try {
-                setFr(new FileReader(this.getF()));
-                setBr(new BufferedReader(this.getFr()));
+                setFileReader(new FileReader(this.getFile()));
+                setBufferedReader(new BufferedReader(this.getFileReader()));
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             }
@@ -25,28 +25,28 @@ public class FileReaderUtil {
         }
     }
 
-    public FileReader getFr() {
-        return fr;
+    public FileReader getFileReader() {
+        return fileReader;
     }
 
-    public void setFr(FileReader fr) {
-        this.fr = fr;
+    public void setFileReader(FileReader fr) {
+        this.fileReader = fr;
     }
 
-    public BufferedReader getBr() {
-        return br;
+    public BufferedReader getBufferedReader() {
+        return bufferedReader;
     }
 
-    public void setBr(BufferedReader br) {
-        this.br = br;
+    public void setBufferedReader(BufferedReader br) {
+        this.bufferedReader = br;
     }
 
-    public File getF() {
-        return f;
+    public File getFile() {
+        return file;
     }
 
-    public void setF(File f) {
-        this.f = f;
+    public void setFile(File f) {
+        this.file = f;
     }
 
     /**
@@ -57,9 +57,9 @@ public class FileReaderUtil {
     public String readFile() {
         String fileRows = "";
         String line = "";
-        if (this.getF().exists()) {
+        if (this.getFile().exists()) {
         	try {
-        		while ((line = this.getBr().readLine()) != null) {
+        		while ((line = this.getBufferedReader().readLine()) != null) {
         			fileRows += line + "\n";
         		}
         	} catch (IOException e) {
