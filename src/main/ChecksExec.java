@@ -141,8 +141,6 @@ public class ChecksExec {
                         this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
                     }
                     else if (cItem.getItemName().equals("OTASS013")) {
-                        //TODO Under implementation - with tasks division
-//                        this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
                         this.checkOtass013IsNewError(checkID, checkItemID, err, exec_time, status);
                     }
                     else if (cItem.getItemName().equals("DPWIN001") || cItem.getItemName().equals("DPWIN002")){
