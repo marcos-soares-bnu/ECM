@@ -30,6 +30,13 @@ public class Constantes {
     public static final String STRING_TKLRES = "\nLast Result:";
     public static final String STRING_TKSTAT = "\nScheduled Task State:";
     
+    //Strings OTASS013
+    public static final String STRING_JOBNAME = "JOBNAME: ";
+    public static final String STRING_ID = "ID     : ";
+    public static final String STRING_STATUS = "STATUS : ";
+    public static final String STRING_TIME = "TIME   : ";
+    public static final String STRING_MESSAGE = "MESSAGE: ";
+    
     //Testing reasons
     public static final boolean LINDE_ENVIRONMENT = false;
     public static final boolean SHOW_DB_MESSAGES = false;

@@ -142,6 +142,8 @@ public class ChecksExec {
                     }
                     else if (cItem.getItemName().equals("OTASS013")) {
                         //TODO Under implementation - with tasks division
+//                        this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
+                        this.checkOtass013IsNewError(checkID, checkItemID, err, exec_time, status);
                     }
                     else if (cItem.getItemName().equals("DPWIN001") || cItem.getItemName().equals("DPWIN002")){
 
@@ -174,9 +176,6 @@ public class ChecksExec {
         boolean isNew = true;
         for (DBCheckOutput out : dbLastErrors.values()) {
             if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
-
-                //if (out.getOutput_error().equalsIgnoreCase(err.getOutput_error())) {
-                //-----------------------------------------------------------
                 if (!out.getOutput_error().contains("No Errors.")) {
                     isNew = false;
                     break;
@@ -184,6 +183,29 @@ public class ChecksExec {
             }
         }
         return isNew;
+    }
+    
+    private void checkOtass013IsNewError (int checkID, int checkItemID, OBJCheckOutput err, Date exec_time, String status) {
+        String erros = err.getOutput_error().replace("\n", "");
+        List<String> listaErros = Arrays.asList(erros.split(Constantes.STRING_JOBNAME));
+        List<String> listaErrosTratados = new ArrayList<>();
+        
+        for (String s : listaErros) {
+            if (s.length() > 1) {
+                s = s.replace(Constantes.STRING_ID, "(");
+                s = s.replace(Constantes.STRING_STATUS, ")(");
+                s = s.replace(Constantes.STRING_TIME, ")(");
+                s = s.replace(Constantes.STRING_MESSAGE, ")(");
+                s = s.replace("\n", "");
+                s = s + ")";
+                listaErrosTratados.add(s);
+            }
+        }
+        
+        for (String s : listaErrosTratados) {
+            OBJCheckOutput outerr = new OBJCheckOutput(s);
+            this.recordArrCheckIsNewError(checkID, checkItemID, outerr, exec_time, status);
+        }
     }
 
     private void recordArrCheckIsNewError(int checkID, int checkItemID, OBJCheckOutput err, Date exec_time, String status) {
@@ -208,7 +230,7 @@ public class ChecksExec {
                 
                 if ( (indSpc > 0) && (checkID == 1))
                 	arrayItemLastErrors_partName.add(out.getOutput_error().substring(0, indSpc));
-                else if ( (indTsk > 0) && (checkID == 3))
+                else if ( (indTsk > 0) && (checkID == 3 || checkID == 2))
                 	arrayItemLastErrors_partName.add(out.getOutput_error().substring(0, indTsk));
                 else
                 	arrayItemLastErrors_partName.add(out.getOutput_error());
@@ -225,7 +247,7 @@ public class ChecksExec {
 	        	int indTsk = s.indexOf("(");
 	        	
 	        	//======================================================================
-	        	//If CheckID = 1 (INFRA), CheckID = 3 (DPWIN), compare partName, else s
+	        	//If CheckID = 1 (INFRA), CheckID = 2 (OTASS), CheckID = 3 (DPWIN), compare partName, else s
 	        	//======================================================================
 	        	String partName;
 	        	if (checkID == 1){
@@ -236,7 +258,7 @@ public class ChecksExec {
 	        		//
 	        		arrayItemLastErrors = arrayItemLastErrors_partName;
 	        	}
-	        	else if (checkID == 3){
+	        	else if (checkID == 3 || checkID == 2){
 	        		if (indTsk > 0)
 	        			partName = s.substring(0, indTsk);
 	        		else
