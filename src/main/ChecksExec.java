@@ -18,6 +18,7 @@ import database.DBCheckOutput;
 import object.OBJCheck;
 import object.OBJCheckItem;
 import object.OBJCheckOutput;
+import secure.DecryptOTASS;
 import text.CheckHandler;
 import text.FileReaderUtil;
 import util.Constantes;
@@ -64,7 +65,12 @@ public class ChecksExec {
 
     public void execCheck() {
         if (Constantes.LINDE_ENVIRONMENT) {
-            this.callCMD();
+            if (objCheck.getId() == 2)
+                //If OTASS, call special implementation
+                this.callCMD(new DecryptOTASS().getUserandPass());
+            else
+                //Else, call standard implementation
+                this.callCMD();
         } else {
             //Tratamento para cada log:
             switch (objCheck.getId()) {
@@ -97,6 +103,17 @@ public class ChecksExec {
     private void callCMD() {
         try {
             Process p = Runtime.getRuntime().exec("cmd /c start /min /wait " + dbCheckConfig.getPath_cmd());
+            p.waitFor();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
+    
+    private void callCMD(String[] userAndPass) {
+        try {
+            Process p = Runtime.getRuntime().exec("cmd /c start /min /wait " + dbCheckConfig.getPath_cmd() 
+            + " " + userAndPass[0] + " " + userAndPass[1]);
             p.waitFor();
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();

@@ -7,7 +7,8 @@ public class Constantes {
     public static final String DB_Checks_Table = "check_scripts";
     public static final String DB_CheckItens_Table = "check_scripts_itens";
     public static final String DB_CheckConfig_Table = "check_scripts_configs";
-    public static final String DB_ChecksOutput_Table= "check_scripts_output";
+    public static final String DB_ChecksOutput_Table = "check_scripts_output";
+    public static final String DB_OTASS_Table = "linde_otass";
     
     //CheckScripts
     public static final int DB_INFRA_ID = 1;
@@ -29,6 +30,10 @@ public class Constantes {
     public static final String STRING_TKLRUN = "\nLast Run Time:";
     public static final String STRING_TKLRES = "\nLast Result:";
     public static final String STRING_TKSTAT = "\nScheduled Task State:";
+    
+    //Strings for OTASS password retrieve
+    public static final String STRING_OTASS_COLS = "user, pass";
+    public static final String STRING_OTASS_CONDITION = "is_enabled = 1";
     
     //Strings OTASS013
     public static final String STRING_JOBNAME = "JOBNAME: ";
