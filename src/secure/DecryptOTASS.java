@@ -50,7 +50,7 @@ public class DecryptOTASS {
     }
        
     private String decrypt(byte[] text) {
-        final String PATH_PRIVATE_KEY = "D:\\IAS_Monitoring\\APP_Dev\\SCHEDScripts\\privateOTASS.key";
+        final String PATH_PRIVATE_KEY = "C:\\Temp\\script result\\privateOTASS.key";
         byte[] decryptedPass = null;
         PrivateKey privateKey = null;
         ObjectInputStream inputStream = null;

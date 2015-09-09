@@ -267,6 +267,23 @@ public class DBCheckOutput {
 
         db.doINSERT(pstmt);
     }
+    
+    public void DB_updateMailSent() {
+        DBUtil db = new DBUtil();
+        String table = Constantes.DB_ChecksOutput_Table;
+        String field = "mail_sent";
+        
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = db.getConn().prepareStatement("UPDATE "+table+" SET "+field+" = 1 WHERE check_id = ? AND check_item_id = ?;");
+            pstmt.setInt(1, this.getCheck_id());
+            pstmt.setInt(2, this.getCheck_item_id());
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+        db.doINSERT(pstmt);    
+    }
+    
 
 	public String getCheck_item_name() {
 		return check_item_name;

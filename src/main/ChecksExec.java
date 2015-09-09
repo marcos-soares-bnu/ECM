@@ -64,7 +64,7 @@ public class ChecksExec {
     }
 
     public void execCheck() {
-        if (Constantes.LINDE_ENVIRONMENT) {
+        if (true) {
             if (objCheck.getId() == 2)
                 //If OTASS, call special implementation
                 this.callCMD(new DecryptOTASS().getUserandPass());

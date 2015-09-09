@@ -1,26 +1,11 @@
 package main;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.swing.JOptionPane;
 
-import database.DBCheck;
-import database.DBCheckConfig;
-import database.DBCheckItem;
 import database.DBCheckOutput;
-import object.OBJCheck;
-import object.OBJCheckItem;
-import object.OBJCheckOutput;
-import text.CheckHandler;
-import text.FileReaderUtil;
-import util.Constantes;
 
 public class SendMails {
 
@@ -39,12 +24,30 @@ public class SendMails {
 
 
     private void sendingArrNewErrors() {
-
         for (DBCheckOutput out : dbNewErrors.values()) {
-
-        	String aux = returnXML(out.getTicket_ci(), out.getTicket_brief(), out.getOutput_error());
-        	String tmp = "";
+            //Prepare XML data to be send
+        	String xmlContent = returnXML(out.getTicket_ci(), out.getTicket_brief(), out.getOutput_error());
+        	String mailTitle = out.getTicket_brief();
+        	//Call the .bat file to send email
+        	try {
+                Process p = Runtime.getRuntime().exec("cmd /c start /min /wait " + 
+        	"psexec \\MLGMUC00APP289 cmd /c start /min /wait C:\\Users\\SRSK0006\\Desktop\\email.bat " +
+                        xmlContent + " " + mailTitle);
+            //Catch the exit code from .bat
+            int exitCode = p.waitFor();
+            
+            if (exitCode == 0) {
+                //Mail sent: set mail_sent = 1
+                out.DB_updateMailSent();
+            }
+            
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, e);
+            }
         }
+        
+        
 
     }
     
@@ -60,8 +63,8 @@ public class SendMails {
     	aux_xml.append("  <ASSIGNMENT>SI.DHS.INT.LINDE_IAS_AO_2ND</ASSIGNMENT> ");
     	aux_xml.append("  <LOGICAL_NAME>" + ticketCI + "</LOGICAL_NAME> ");
     	//aux_xml.append("  <BRIEF_DESCRIPTION><![CDATA[" + ticketBrief + "]]></BRIEF_DESCRIPTION> ");
-    	aux_xml.append("  <BRIEF_DESCRIPTION>" + ticketBrief.replace("\n", "|") + "</BRIEF_DESCRIPTION> ");
-    	aux_xml.append("  <ACTION>" + ticketDesc + "</ACTION> ");
+    	aux_xml.append("  <BRIEF_DESCRIPTION>" + ticketBrief + "</BRIEF_DESCRIPTION> ");
+    	aux_xml.append("  <ACTION>" + ticketDesc.replace("\n", "|") + "</ACTION> ");
     	aux_xml.append("</DSCEMO>");
     	
     	return aux_xml.toString();

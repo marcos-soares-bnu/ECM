@@ -11,17 +11,17 @@ public class MajorMain {
         Date executionTime = new Date();
 
         System.out.println("Starting the execution of the SCHEDULED Scripts at:\n" + executionTime);
-
+        
         ChangeCheck change = new ChangeCheck(executionTime);
         change.checkChanges();
-
+        
         ChecksExec infra = new ChecksExec(Constantes.DB_INFRA_ID, executionTime);
         //Só procede se existem itens (não está em change)
         if (infra.getObjCheck().getItens().size() > 0) {
             infra.execCheck();
             infra.storeINDB();
         }
-        
+      
         ChecksExec otass = new ChecksExec(Constantes.DB_OTASS_ID, executionTime);
         if (otass.getObjCheck().getItens().size() > 0) {
             otass.execCheck();
@@ -51,6 +51,9 @@ public class MajorMain {
             pixcore.execCheck();
             pixcore.storeINDB();
         }
+        
+        SendMails sendMails = new SendMails();
+        sendMails.startSend();
 
         executionTime = new Date();
         System.out.println("Finished the execution of the SCHEDULED Scripts at:\n" + executionTime);
