@@ -94,10 +94,33 @@ public class DBUtil {
         }
     }
 
+    //MPS - ini...
+    public String getLastExecTime() {
+        String fields = "MAX(exec_time)";
+        String table = Constantes.DB_ChecksOutput_Table;
+        String condition = "";
+        ResultSet rs = this.doSelect(fields, table, condition);
+
+        String strExec = "";
+        try {
+            if (rs.next()) {
+                Timestamp execDB = rs.getTimestamp("MAX(exec_time)");
+                if (execDB != null) {
+                    strExec = dtUtil.getStrDateFromDB(execDB.getTime());
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return strExec;
+    }
+    //MPS - fim...
+    
     public String getLastExecTime(int checkID, Date execTime) {
         String fields = "MAX(exec_time)";
         String table = Constantes.DB_ChecksOutput_Table;
         String dbExecTime = dtUtil.getDBFormat(execTime);
+        
         String condition = "check_id=" + checkID + " AND exec_time <> '" + dbExecTime + "'";
         ResultSet rs = this.doSelect(fields, table, condition);
 
