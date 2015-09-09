@@ -26,13 +26,14 @@ public class SendMails {
     private void sendingArrNewErrors() {
         for (DBCheckOutput out : dbNewErrors.values()) {
             //Prepare XML data to be send
-        	String xmlContent = returnXML(out.getTicket_ci(), out.getTicket_brief(), out.getOutput_error());
-        	String mailTitle = out.getTicket_brief();
+        	String xmlContent = "\""+returnXML(out.getTicket_ci(), out.getTicket_brief(), out.getOutput_error())+"\"";
+        	String mailTitle = "\""+out.getTicket_brief()+"\"";
+        	String command = "cmd /c start /min /wait " + 
+                	"D:\\IAS_Monitoring\\APP_Dev\\SCHEDScripts\\psexec \\MLGMUC00APP289 C:\\Users\\SRSK0006\\Desktop\\email.bat " +
+                    xmlContent + " " + mailTitle;
         	//Call the .bat file to send email
         	try {
-                Process p = Runtime.getRuntime().exec("cmd /c start /min /wait " + 
-        	"psexec \\MLGMUC00APP289 cmd /c start /min /wait C:\\Users\\SRSK0006\\Desktop\\email.bat " +
-                        xmlContent + " " + mailTitle);
+                Process p = Runtime.getRuntime().exec(command);
             //Catch the exit code from .bat
             int exitCode = p.waitFor();
             

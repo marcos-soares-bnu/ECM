@@ -275,9 +275,8 @@ public class DBCheckOutput {
         
         PreparedStatement pstmt = null;
         try {
-            pstmt = db.getConn().prepareStatement("UPDATE "+table+" SET "+field+" = 1 WHERE check_id = ? AND check_item_id = ?;");
-            pstmt.setInt(1, this.getCheck_id());
-            pstmt.setInt(2, this.getCheck_item_id());
+            pstmt = db.getConn().prepareStatement("UPDATE "+table+" SET "+field+" = 1 WHERE id = ?;");
+            pstmt.setInt(1, this.getId());
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
         }

@@ -50,7 +50,7 @@ public class DecryptOTASS {
     }
        
     private String decrypt(byte[] text) {
-        final String PATH_PRIVATE_KEY = "C:\\Temp\\script result\\privateOTASS.key";
+        final String PATH_PRIVATE_KEY = "D:\\IAS_Monitoring\\APP_Dev\\SCHEDScripts\\privateOTASS.key";
         byte[] decryptedPass = null;
         PrivateKey privateKey = null;
         ObjectInputStream inputStream = null;
@@ -75,6 +75,12 @@ public class DecryptOTASS {
         } catch (IOException e) {
             System.out.println("Error while reading OTASS private key file.");
             e.printStackTrace();
+        } finally {
+        	try {
+				inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
         }
         
         //Decrypt the password
