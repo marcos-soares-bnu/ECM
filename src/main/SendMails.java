@@ -28,6 +28,15 @@ public class SendMails {
             //Prepare XML data to be send
         	String xmlContent = "\""+returnXML(out.getTicket_ci(), out.getTicket_brief(), out.getOutput_error())+"\"";
         	String mailTitle = "\""+out.getTicket_brief()+"\"";
+        	
+
+        	//=================================================================================
+        	//Implementar...
+        	//
+        	//psexec \\remotemachine -u remoteuser -i -d cmd -c localdisk:\folder\batchfile.bat
+        	//-c will copy from local path        	
+        	//=================================================================================
+        	
         	String command = "cmd /c start /min /wait " + 
                 	"D:\\IAS_Monitoring\\APP_Dev\\SCHEDScripts\\psexec \\MLGMUC00APP289 C:\\Users\\SRSK0006\\Desktop\\email.bat " +
                     xmlContent + " " + mailTitle;
@@ -50,6 +59,23 @@ public class SendMails {
         
         
 
+    }
+    
+    
+    private String returnBAT(String TITLE, String XML){
+
+    	StringBuilder aux_xml = new StringBuilder();
+    	aux_xml.append("@ECHO OFF");
+    	aux_xml.append("SET MAIL=" + XML);
+    	aux_xml.append("SET MAIL_TITLE=" + TITLE);
+    	aux_xml.append("SET Returncode=0");
+    	aux_xml.append("SET mail_progr=C:/Users/SRSK0006/Desktop/sendEmail.exe");
+    	aux_xml.append("SET mail_server=smtpeu.linde.grp");
+    	aux_xml.append("SET mail_sender=ixos-admin@Linde-DCM.com");
+    	aux_xml.append("SET mail_target=DL_ECM@t-systems.com.br");
+    	aux_xml.append("\"%mail_progr%\" -f \"%mail_sender%\" -t \"%mail_target%\" -u \"%MAIL_TITLE%\" -m \"%MAIL%\" -s \"%mail_server%\"");    	
+    	
+    	return aux_xml.toString();
     }
     
     
