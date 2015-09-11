@@ -64,7 +64,7 @@ public class ChecksExec {
     }
 
     public void execCheck() {
-        if (true) {
+        if (Constantes.LINDE_ENVIRONMENT) {
             if (objCheck.getId() == 2)
                 //If OTASS, call special implementation
                 this.callCMD(new DecryptOTASS().getUserandPass());
@@ -233,6 +233,8 @@ public class ChecksExec {
         List<String> arrayItemLastErrors = new ArrayList<String>();
         List<String> arrayItemLastErrors_fullName = new ArrayList<String>();
         List<String> arrayItemLastErrors_partName = new ArrayList<String>();
+        //add PipeMom to compare when NDocs > 1000... - MPS - 11/09/2015
+        List<String> arrayItemLastErrors_pipeMomName = new ArrayList<String>();
 
         for (DBCheckOutput out : dbLastErrors.values()) {
             if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
@@ -242,9 +244,13 @@ public class ChecksExec {
                 //
                 int indSpc = out.getOutput_error().indexOf(" ");
                 int indTsk = out.getOutput_error().indexOf("(");
+                int indUnd = out.getOutput_error().indexOf("_"); // NDocs > 0 - 11/09/2015
                 
-                if ( (indSpc > 0) && (checkID == 1))
+                if ( (indSpc > 0) && (checkID == 1)){
                 	arrayItemLastErrors_partName.add(out.getOutput_error().substring(0, indSpc));
+                	if (indUnd > 0)
+                		arrayItemLastErrors_pipeMomName.add(out.getOutput_error().substring(0, indUnd)); // NDocs > 0 - 11/09/2015
+                }
                 else if ( (indTsk > 0) && (checkID == 3 || checkID == 2))
                 	arrayItemLastErrors_partName.add(out.getOutput_error().substring(0, indTsk));
                 else
@@ -259,15 +265,27 @@ public class ChecksExec {
 	        for (String s : arrayMonErrors) {
 	        	//
 	        	int indSpc = s.indexOf(" ");
+	        	int indSpc2 = 0;
+	        	if (indSpc > 0){
+		        	indSpc2 = s.substring(indSpc+1).indexOf(" ") + indSpc + 1;
+	        	}
 	        	int indTsk = s.indexOf("(");
 	        	
 	        	//======================================================================
 	        	//If CheckID = 1 (INFRA), CheckID = 2 (OTASS), CheckID = 3 (DPWIN), compare partName, else s
 	        	//======================================================================
-	        	String partName;
+	        	String partName = "";
+	        	int nDocs = 0;
 	        	if (checkID == 1){
 	        		if (indSpc > 0)
 	        			partName = s.substring(0, indSpc);
+		        		if (indSpc2 > 0){
+		        			try {
+		        				nDocs = Integer.parseInt(s.substring(indSpc, indSpc2).trim());								
+							} catch (Exception e) {
+								nDocs = 0;
+							}
+		        		}
 	        		else
 	        			partName = s;
 	        		//
@@ -288,13 +306,33 @@ public class ChecksExec {
 	        	//
 	        	//Create the error output
 	        	//Record objCheck information on DB...
-	            if (arrayItemLastErrors.contains(partName)) {
-	            	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 0); //isNew=0);
-	            	dbOutput.DB_store();
-	            } else {
-	            	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 1); //isNew=1);
-	            	dbOutput.DB_store();
-	            }
+	        	//
+	        	//------------------------------------ Ndocs > 1000 (new rule - 10/9/2015)
+	        	//------------------------------------ Pipeline NOT contains _error 
+	        	if ((nDocs > 1000) && (partName.indexOf("_error") == -1)){
+
+	        		//
+	        		String pipeMom_partName = partName.substring(0, partName.indexOf("_"));
+	        		
+	        		//If contains a partname of Mom Pipeline...
+	        		if (arrayItemLastErrors_pipeMomName.contains(pipeMom_partName)){
+		            	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 0); //isNew=0);
+		            	dbOutput.DB_store();
+		            } else {
+		            	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 1); //isNew=1);
+		            	dbOutput.DB_store();
+		            }
+	        	}
+	        	else{
+	        		// Ndocs <= 1000 = Normal Process...
+		            if (arrayItemLastErrors.contains(partName)) {
+		            	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 0); //isNew=0);
+		            	dbOutput.DB_store();
+		            } else {
+		            	DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 1); //isNew=1);
+		            	dbOutput.DB_store();
+		            }
+	        	}
 	        }
         }
         //If aux_err is empty, it means that search of tasks return no errors...
@@ -319,7 +357,8 @@ public class ChecksExec {
     	indLOGICLEN = indLOGIC + Constantes.STRING_LOGICSWITCH.length();
     	
     	//Store items of Log file...
-    	if (indLOGIC > 0){
+    	if (indLOGIC >= 0){			//add new Rule when there no exists tasks - 11/09/2015
+    								//the validation of tasks below, is set too on CMD...
 
     		//MPS - ajuste quebras em 27/08/2015...
     		String aux_err = "";
