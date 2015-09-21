@@ -42,6 +42,9 @@ public class Constantes {
     public static final String STRING_TIME = "TIME   : ";
     public static final String STRING_MESSAGE = "MESSAGE: ";
     
+    //Strings SendMail
+    public static final String MAIL_TARGET = "DL_ECM@t-systems.com.br";
+    
     //Testing reasons
     public static final boolean LINDE_ENVIRONMENT = true;
     public static final boolean SHOW_DB_MESSAGES = false;

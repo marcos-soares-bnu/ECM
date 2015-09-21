@@ -43,6 +43,10 @@ public class DBUtil {
         try {
             stmt = this.getConn().createStatement();
             stmt.executeUpdate(sql);
+
+            //MPS - best practices JDBC close...
+            stmt.close();
+            
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -64,7 +68,25 @@ public class DBUtil {
 
         try {
             Statement stmt = conn.createStatement();
-            return stmt.executeQuery(sql);
+            
+            //MPS - best practices JDBC close...
+            try {
+            	ResultSet resultset = stmt.executeQuery(sql);
+            	
+            	try{
+            		//
+            		return resultset;
+            		
+            	} finally {
+            		resultset.close();
+            	}
+            } finally {
+            	stmt.close();
+            }
+            
+            //
+            //return stmt.executeQuery(sql);
+            
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, e);
@@ -88,6 +110,10 @@ public class DBUtil {
         try {
             stmt = this.getConn().createStatement();
             stmt.executeUpdate(sql);
+            
+            //MPS - best practices JDBC close...
+            stmt.close();
+            
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, e);
@@ -141,6 +167,10 @@ public class DBUtil {
     public void doINSERT(PreparedStatement pstmt) {
         try {
             pstmt.executeUpdate();
+            
+            //MPS - best practices JDBC close...
+            pstmt.close();
+            
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, e);
