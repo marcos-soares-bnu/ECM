@@ -75,6 +75,12 @@ public class DecryptOTASS {
         } catch (IOException e) {
             System.out.println("Error while reading OTASS private key file.");
             e.printStackTrace();
+        } finally {
+        	try {
+				inputStream.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
         }
         
         //Decrypt the password

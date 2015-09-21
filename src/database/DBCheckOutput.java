@@ -25,7 +25,25 @@ public class DBCheckOutput {
     private Date exec_time;
     private int is_new;
     private int mail_sent;
+    
+    //MPS - ini...
+    private String check_item_name;
+    private String ticket_ci;
+    private String ticket_brief;
+    
+    public DBCheckOutput(int id, String check_item_name, String ticket_ci, String ticket_brief, String output_error) {
+        this.id = id;
+        this.setCheck_item_name(check_item_name);
+        this.setTicket_ci(ticket_ci);
+        this.setTicket_brief(ticket_brief);
+        this.output_error = output_error;
+    }
 
+    public DBCheckOutput() {
+    	
+    }
+    //MPS - fim
+    
     public DBCheckOutput(int id, int check_id, int check_item_id, String status, String output_error, Date exec_time, int is_new, int mail_sent) {
         this.id = id;
         this.check_id = check_id;
@@ -126,6 +144,54 @@ public class DBCheckOutput {
         this.mail_sent = mail_sent;
     }
 
+
+    //==============================================================================
+    // MPS - start...
+    //
+    public Map<Integer, DBCheckOutput> DB_retrieveNewErrors() {
+        Map<Integer, DBCheckOutput> newErrors = new HashMap<Integer, DBCheckOutput>();
+        //metodo para pegar as infos do banco
+        DBUtil db = new DBUtil();
+
+        //Get lastExecTime
+        String strDBLastExec = db.getLastExecTime();
+
+        //Check if exists last errors 
+        if (!strDBLastExec.isEmpty()) {
+            //MPS ini...
+        	String fields = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_CI as 'Ticket CI', lcitens.ticket_brief as 'Ticket Brief', outp.output_error as 'Ticket Description'";
+        	String tables0 = "check_scripts_output outp ";
+        	String tables1 = "INNER JOIN check_scripts_itens citens ON ";
+        	String tables2 = "citens.id = outp.check_item_id ";
+        	String tables3 = "INNER JOIN linde_check_itens lcitens ON ";
+        	String tables4 = "lcitens.code = citens.item_name ";
+        	String condition = "outp.status='NOK' AND outp.is_new='1' AND outp.mail_sent='0' AND outp.exec_time = '" + strDBLastExec + "'";
+        	//
+        	ResultSet rs = db.doSelect(fields, (tables0 + tables1 + tables2 + tables3 + tables4), condition);
+        	//MPS fim...
+
+            try {
+                while (rs.next()) {
+                    int id = rs.getInt("outp.id");
+                    String checkItem = rs.getString("Check Item");
+                    String ticketCI = rs.getString("Ticket CI");
+                    String ticketBrief = rs.getString("Ticket Brief");
+                    String ticketDescr = rs.getString("Ticket Description");
+
+                    DBCheckOutput err = new DBCheckOutput(id, checkItem, ticketCI, ticketBrief, ticketDescr);
+                    newErrors.put(newErrors.size() + 1, err);
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+                JOptionPane.showMessageDialog(null, e);
+            }
+        }
+        return newErrors;
+    }
+    // MPS - end...
+    //==============================================================================
+    
+    
     public Map<Integer, DBCheckOutput> DB_retrieveLastErrors() {
         Map<Integer, DBCheckOutput> lastErrors = new HashMap<Integer, DBCheckOutput>();
         if (this.getCheck_id() == 0 || this.exec_time == null) {
@@ -201,4 +267,44 @@ public class DBCheckOutput {
 
         db.doINSERT(pstmt);
     }
+    
+    public void DB_updateMailSent() {
+        DBUtil db = new DBUtil();
+        String table = Constantes.DB_ChecksOutput_Table;
+        String field = "mail_sent";
+        
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = db.getConn().prepareStatement("UPDATE "+table+" SET "+field+" = 1 WHERE id = ?;");
+            pstmt.setInt(1, this.getId());
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+        db.doINSERT(pstmt);    
+    }
+    
+
+	public String getCheck_item_name() {
+		return check_item_name;
+	}
+
+	public void setCheck_item_name(String check_item_name) {
+		this.check_item_name = check_item_name;
+	}
+
+	public String getTicket_ci() {
+		return ticket_ci;
+	}
+
+	public void setTicket_ci(String ticket_ci) {
+		this.ticket_ci = ticket_ci;
+	}
+
+	public String getTicket_brief() {
+		return ticket_brief;
+	}
+
+	public void setTicket_brief(String ticket_brief) {
+		this.ticket_brief = ticket_brief;
+	}
 }
