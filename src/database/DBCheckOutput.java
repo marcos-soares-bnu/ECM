@@ -184,6 +184,9 @@ public class DBCheckOutput {
             } catch (SQLException e) {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(null, e);
+            } finally {
+            	//MPS - close
+            	db.closeConn();
             }
         }
         return newErrors;
@@ -224,6 +227,9 @@ public class DBCheckOutput {
                 } catch (SQLException e) {
                     e.printStackTrace();
                     JOptionPane.showMessageDialog(null, e);
+                } finally {
+                	//MPS - close
+                	db.closeConn();
                 }
             }
         }
@@ -240,6 +246,8 @@ public class DBCheckOutput {
                 "'" + strDate + "'," +  this.getIs_new() + "," + this.getMail_sent();
         
         db.doINSERT(table, fields, values);
+        //MPS
+        db.closeConn();
     }
     
     public void DB_store() {
@@ -266,6 +274,8 @@ public class DBCheckOutput {
         }
 
         db.doINSERT(pstmt);
+        //MPS
+        db.closeConn();
     }
     
     public void DB_updateMailSent() {
@@ -281,6 +291,8 @@ public class DBCheckOutput {
             JOptionPane.showMessageDialog(null, e);
         }
         db.doINSERT(pstmt);    
+        //MPS
+        db.closeConn();
     }
     
 
