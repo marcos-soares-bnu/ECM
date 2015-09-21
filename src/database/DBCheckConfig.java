@@ -58,6 +58,10 @@ public class DBCheckConfig {
                 
             } catch (SQLException e) {
                 e.printStackTrace();
+                
+            } finally {
+            	//MPS - close
+            	db.closeConn();
             }
         } else {
             System.err.println("Check ID nonexistent. Can't retrieve anything from database.");

@@ -32,7 +32,7 @@ public class DBUtil {
         }
         return conn;
     }
-
+    
     public void execSQL(String sql) {
     	//Testing reasons
         if (Constantes.SHOW_DB_MESSAGES) {
@@ -69,23 +69,7 @@ public class DBUtil {
         try {
             Statement stmt = conn.createStatement();
             
-            //MPS - best practices JDBC close...
-            try {
-            	ResultSet resultset = stmt.executeQuery(sql);
-            	
-            	try{
-            		//
-            		return resultset;
-            		
-            	} finally {
-            		resultset.close();
-            	}
-            } finally {
-            	stmt.close();
-            }
-            
-            //
-            //return stmt.executeQuery(sql);
+            return stmt.executeQuery(sql);
             
         } catch (SQLException e) {
             e.printStackTrace();
@@ -176,4 +160,16 @@ public class DBUtil {
             JOptionPane.showMessageDialog(null, e);
         }
     }
+    
+    
+    //MPS - close at the end...
+    public void closeConn(){
+		try {
+			conn.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+	}
+    
+    
 }
