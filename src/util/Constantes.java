@@ -43,7 +43,7 @@ public class Constantes {
     public static final String STRING_MESSAGE = "MESSAGE: ";
     
     //Strings SendMail
-    public static final String MAIL_TARGET = "DL_ECM@t-systems.com.br";
+    public static final String MAIL_TARGET = "IncidentMailService@t-systems.com";
     
     //Testing reasons
     public static final boolean LINDE_ENVIRONMENT = true;

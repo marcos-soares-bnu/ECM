@@ -30,13 +30,15 @@ public class DBCheckOutput {
     private String check_item_name;
     private String ticket_ci;
     private String ticket_brief;
+    private int ticket_prio;
     
-    public DBCheckOutput(int id, String check_item_name, String ticket_ci, String ticket_brief, String output_error) {
+    public DBCheckOutput(int id, String check_item_name, String ticket_ci, String ticket_brief, String output_error, int ticketPrio) {
         this.id = id;
         this.setCheck_item_name(check_item_name);
         this.setTicket_ci(ticket_ci);
         this.setTicket_brief(ticket_brief);
         this.output_error = output_error;
+        this.setTicket_prio(ticketPrio);
     }
 
     public DBCheckOutput() {
@@ -79,8 +81,16 @@ public class DBCheckOutput {
         this.check_id = checkID;
         this.exec_time = execTime;
     }
+    
+    public int getTicket_prio() {
+		return ticket_prio;
+	}
 
-    public int getId() {
+	private void setTicket_prio(int ticket_prio) {
+		this.ticket_prio = ticket_prio;
+	}
+
+	public int getId() {
         return id;
     }
 
@@ -159,7 +169,7 @@ public class DBCheckOutput {
         //Check if exists last errors 
         if (!strDBLastExec.isEmpty()) {
             //MPS ini...
-        	String fields = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_CI as 'Ticket CI', lcitens.ticket_brief as 'Ticket Brief', outp.output_error as 'Ticket Description'";
+        	String fields = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_CI as 'Ticket CI', lcitens.ticket_prio as 'Ticket Prio', lcitens.ticket_brief as 'Ticket Brief', outp.output_error as 'Ticket Description'";
         	String tables0 = "check_scripts_output outp ";
         	String tables1 = "INNER JOIN check_scripts_itens citens ON ";
         	String tables2 = "citens.id = outp.check_item_id ";
@@ -177,8 +187,9 @@ public class DBCheckOutput {
                     String ticketCI = rs.getString("Ticket CI");
                     String ticketBrief = rs.getString("Ticket Brief");
                     String ticketDescr = rs.getString("Ticket Description");
+                    int ticketPrio = rs.getInt("Ticket Prio");
 
-                    DBCheckOutput err = new DBCheckOutput(id, checkItem, ticketCI, ticketBrief, ticketDescr);
+                    DBCheckOutput err = new DBCheckOutput(id, checkItem, ticketCI, ticketBrief, ticketDescr, ticketPrio);
                     newErrors.put(newErrors.size() + 1, err);
                 }
             } catch (SQLException e) {

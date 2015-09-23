@@ -16,7 +16,7 @@ public class MajorMain {
         change.checkChanges();
         
         ChecksExec infra = new ChecksExec(Constantes.DB_INFRA_ID, executionTime);
-        //Só procede se existem itens (não está em change)
+        //So procede se existem itens (nao esta em change)
         if (infra.getObjCheck().getItens().size() > 0) {
             infra.execCheck();
             infra.storeINDB();
