@@ -161,9 +161,12 @@ public class ChecksExec {
                         this.checkOtass013IsNewError(checkID, checkItemID, err, exec_time, status);
                     }
                     else if (cItem.getItemName().equals("DPWIN001") || cItem.getItemName().equals("DPWIN002")){
-
                         //record list of New Errors/Exists on DB...
                         this.recordArrCheckIsNewErrorTasks(checkID, checkItemID, err, exec_time, status);
+                    }
+                    //MPS - Checks manually implemented...multiple tickets per Batches...  
+                    else if (cItem.getItemName().equals("FCIR005") || cItem.getItemName().equals("PIX014")){
+                        this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
                     }
                     else{
                     	int isNew = this.checkIsNewError(checkID, checkItemID, err) ? 1 : 0;                    	
@@ -251,7 +254,7 @@ public class ChecksExec {
                 	if (indUnd > 0)
                 		arrayItemLastErrors_pipeMomName.add(out.getOutput_error().substring(0, indUnd)); // NDocs > 0 - 11/09/2015
                 }
-                else if ( (indTsk > 0) && (checkID == 3 || checkID == 2))
+                else if ( (indTsk > 0) && (checkID == 3 || checkID == 2 || checkID == 5 || checkID == 6))//Add FCIR005/6 And PIXCORE014 - MPS 25/09/2015
                 	arrayItemLastErrors_partName.add(out.getOutput_error().substring(0, indTsk));
                 else
                 	arrayItemLastErrors_partName.add(out.getOutput_error());
@@ -272,7 +275,8 @@ public class ChecksExec {
 	        	int indTsk = s.indexOf("(");
 	        	
 	        	//======================================================================
-	        	//If CheckID = 1 (INFRA), CheckID = 2 (OTASS), CheckID = 3 (DPWIN), compare partName, else s
+	        	//If CheckID = 1 (INFRA), CheckID = 2 (OTASS), CheckID = 3 (DPWIN)
+	        	//   CheckID = 5 (FCIR),  CheckID = 6 (PIXCORE),compare partName, else s
 	        	//======================================================================
 	        	String partName = "";
 	        	int nDocs = 0;
@@ -291,7 +295,7 @@ public class ChecksExec {
 	        		//
 	        		arrayItemLastErrors = arrayItemLastErrors_partName;
 	        	}
-	        	else if (checkID == 3 || checkID == 2){
+	        	else if (checkID == 3 || checkID == 2 || checkID == 5 || checkID == 6){ //Add FCIR005/6 And PIXCORE014 - MPS 25/09/2015
 	        		if (indTsk > 0)
 	        			partName = s.substring(0, indTsk);
 	        		else
