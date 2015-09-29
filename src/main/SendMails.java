@@ -90,7 +90,7 @@ public class SendMails {
     	aux_xml.append("<EVTYPE>DSCEMO</EVTYPE>");
     	aux_xml.append("<CONTACT_NAME>DUMMY-USER-LINDE</CONTACT_NAME>");
     	aux_xml.append("<PROBLEM_MSS>1000.0002.0004</PROBLEM_MSS>");
-    	aux_xml.append("<ASSIGNMENT>SI.DHS.INT.LINDE_IAS_AO_2ND</ASSIGNMENT>");
+    	aux_xml.append("<ASSIGNMENT>SI.DHS.INT.LINDE_IAS_AO_1ST</ASSIGNMENT>");
     	aux_xml.append("<LOGICAL_NAME>" + ticketCI + "</LOGICAL_NAME>");
     	aux_xml.append("<BRIEF_DESCRIPTION>" + ticketBrief + "</BRIEF_DESCRIPTION>");
     	aux_xml.append("<ACTION>" + ticketDesc.replace("\n", "|") + "</ACTION>");
