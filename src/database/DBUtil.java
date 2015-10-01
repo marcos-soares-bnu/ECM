@@ -32,13 +32,13 @@ public class DBUtil {
         }
         return conn;
     }
-    
+
     public void execSQL(String sql) {
-    	//Testing reasons
+        //Testing reasons
         if (Constantes.SHOW_DB_MESSAGES) {
             System.out.println(sql);
         }
-        
+
         Statement stmt = null;
         try {
             stmt = this.getConn().createStatement();
@@ -46,12 +46,12 @@ public class DBUtil {
 
             //MPS - best practices JDBC close...
             stmt.close();
-            
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
-    
+
     public ResultSet doSelect(String fields, String table, String condition) {
         String sql = "SELECT " + fields;
         sql += " FROM " + table;
@@ -63,14 +63,14 @@ public class DBUtil {
 
         //Testing reasons
         if (Constantes.SHOW_DB_MESSAGES) {
-        	System.out.println(sql);
+            System.out.println(sql);
         }
 
         try {
             Statement stmt = conn.createStatement();
-            
+
             return stmt.executeQuery(sql);
-            
+
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, e);
@@ -78,6 +78,7 @@ public class DBUtil {
         return null;
     }
 
+    @Deprecated
     public void doINSERT(String table, String fields, String values) {
         String sql = "INSERT INTO " + table;
 
@@ -94,16 +95,16 @@ public class DBUtil {
         try {
             stmt = this.getConn().createStatement();
             stmt.executeUpdate(sql);
-            
+
             //MPS - best practices JDBC close...
             stmt.close();
-            
+
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, e);
         }
     }
-    
+
     //MPS - ini...
     public String getLastExecTime() {
         String fields = "MAX(exec_time)";
@@ -125,12 +126,12 @@ public class DBUtil {
         return strExec;
     }
     //MPS - fim...
-    
+
     public String getLastExecTime(int checkID, Date execTime) {
         String fields = "MAX(exec_time)";
         String table = Constantes.DB_ChecksOutput_Table;
         String dbExecTime = dtUtil.getDBFormat(execTime);
-        
+
         String condition = "check_id=" + checkID + " AND exec_time <> '" + dbExecTime + "'";
         ResultSet rs = this.doSelect(fields, table, condition);
 
@@ -150,26 +151,27 @@ public class DBUtil {
 
     public void doINSERT(PreparedStatement pstmt) {
         try {
+            if (Constantes.SHOW_DB_MESSAGES) {
+                System.out.println(pstmt);
+            }
             pstmt.executeUpdate();
-            
+
             //MPS - best practices JDBC close...
             pstmt.close();
-            
+
         } catch (SQLException e) {
             e.printStackTrace();
             JOptionPane.showMessageDialog(null, e);
         }
     }
-    
-    
+
     //MPS - close at the end...
-    public void closeConn(){
-		try {
-			conn.close();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-	}
-    
-    
+    public void closeConn() {
+        try {
+            conn.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }

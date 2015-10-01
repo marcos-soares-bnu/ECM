@@ -16,7 +16,7 @@ import util.DateUtil;
 public class DBCheckOutput {
 
     private DateUtil dtUtil = new DateUtil();
-    
+
     private int id;
     private int check_id;
     private int check_item_id;
@@ -25,13 +25,13 @@ public class DBCheckOutput {
     private Date exec_time;
     private int is_new;
     private int mail_sent;
-    
+
     //MPS - ini...
     private String check_item_name;
     private String ticket_ci;
     private String ticket_brief;
     private int ticket_prio;
-    
+
     public DBCheckOutput(int id, String check_item_name, String ticket_ci, String ticket_brief, String output_error, int ticketPrio) {
         this.id = id;
         this.setCheck_item_name(check_item_name);
@@ -42,10 +42,10 @@ public class DBCheckOutput {
     }
 
     public DBCheckOutput() {
-    	
+
     }
     //MPS - fim
-    
+
     public DBCheckOutput(int id, int check_id, int check_item_id, String status, String output_error, Date exec_time, int is_new, int mail_sent) {
         this.id = id;
         this.check_id = check_id;
@@ -81,16 +81,16 @@ public class DBCheckOutput {
         this.check_id = checkID;
         this.exec_time = execTime;
     }
-    
+
     public int getTicket_prio() {
-		return ticket_prio;
-	}
+        return ticket_prio;
+    }
 
-	private void setTicket_prio(int ticket_prio) {
-		this.ticket_prio = ticket_prio;
-	}
+    private void setTicket_prio(int ticket_prio) {
+        this.ticket_prio = ticket_prio;
+    }
 
-	public int getId() {
+    public int getId() {
         return id;
     }
 
@@ -154,7 +154,6 @@ public class DBCheckOutput {
         this.mail_sent = mail_sent;
     }
 
-
     //==============================================================================
     // MPS - start...
     //
@@ -169,16 +168,16 @@ public class DBCheckOutput {
         //Check if exists last errors 
         if (!strDBLastExec.isEmpty()) {
             //MPS ini...
-        	String fields = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_CI as 'Ticket CI', lcitens.ticket_prio as 'Ticket Prio', lcitens.ticket_brief as 'Ticket Brief', outp.output_error as 'Ticket Description'";
-        	String tables0 = "check_scripts_output outp ";
-        	String tables1 = "INNER JOIN check_scripts_itens citens ON ";
-        	String tables2 = "citens.id = outp.check_item_id ";
-        	String tables3 = "INNER JOIN linde_check_itens lcitens ON ";
-        	String tables4 = "lcitens.code = citens.item_name ";
-        	String condition = "outp.status='NOK' AND outp.is_new='1' AND outp.mail_sent='0' AND outp.exec_time = '" + strDBLastExec + "'";
-        	//
-        	ResultSet rs = db.doSelect(fields, (tables0 + tables1 + tables2 + tables3 + tables4), condition);
-        	//MPS fim...
+            String fields = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_CI as 'Ticket CI', lcitens.ticket_prio as 'Ticket Prio', lcitens.ticket_brief as 'Ticket Brief', outp.output_error as 'Ticket Description'";
+            String tables0 = "check_scripts_output outp ";
+            String tables1 = "INNER JOIN check_scripts_itens citens ON ";
+            String tables2 = "citens.id = outp.check_item_id ";
+            String tables3 = "INNER JOIN linde_check_itens lcitens ON ";
+            String tables4 = "lcitens.code = citens.item_name ";
+            String condition = "outp.status='NOK' AND outp.is_new='1' AND outp.mail_sent='0' AND outp.exec_time = '" + strDBLastExec + "'";
+            //
+            ResultSet rs = db.doSelect(fields, (tables0 + tables1 + tables2 + tables3 + tables4), condition);
+            //MPS fim...
 
             try {
                 while (rs.next()) {
@@ -196,16 +195,15 @@ public class DBCheckOutput {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(null, e);
             } finally {
-            	//MPS - close
-            	db.closeConn();
+                //MPS - close
+                db.closeConn();
             }
         }
         return newErrors;
     }
     // MPS - end...
     //==============================================================================
-    
-    
+
     public Map<Integer, DBCheckOutput> DB_retrieveLastErrors() {
         Map<Integer, DBCheckOutput> lastErrors = new HashMap<Integer, DBCheckOutput>();
         if (this.getCheck_id() == 0 || this.exec_time == null) {
@@ -239,28 +237,28 @@ public class DBCheckOutput {
                     e.printStackTrace();
                     JOptionPane.showMessageDialog(null, e);
                 } finally {
-                	//MPS - close
-                	db.closeConn();
+                    //MPS - close
+                    db.closeConn();
                 }
             }
         }
         return lastErrors;
     }
 
+    @Deprecated
     public void DB_store_OLD() {
         //metodo para gravar este item no banco
         DBUtil db = new DBUtil();
         String table = Constantes.DB_ChecksOutput_Table;
         String fields = "check_id, check_item_id, status, output_error, exec_time, is_new, mail_sent";
-        String strDate = dtUtil.getDBFormat(this.getExec_time()); 
-        String values = "'" + this.getCheck_id() + "'," + "'" + this.getCheck_item_id() + "'," + "'" + this.getStatus() + "'," + "'" + this.getOutput_error() + "'," +
-                "'" + strDate + "'," +  this.getIs_new() + "," + this.getMail_sent();
-        
+        String strDate = dtUtil.getDBFormat(this.getExec_time());
+        String values = "'" + this.getCheck_id() + "'," + "'" + this.getCheck_item_id() + "'," + "'" + this.getStatus() + "'," + "'" + this.getOutput_error() + "'," + "'" + strDate + "'," + this.getIs_new() + "," + this.getMail_sent();
+
         db.doINSERT(table, fields, values);
         //MPS
         db.closeConn();
     }
-    
+
     public void DB_store() {
         //metodo para gravar este item no banco
         DBUtil db = new DBUtil();
@@ -288,46 +286,45 @@ public class DBCheckOutput {
         //MPS
         db.closeConn();
     }
-    
+
     public void DB_updateMailSent() {
         DBUtil db = new DBUtil();
         String table = Constantes.DB_ChecksOutput_Table;
         String field = "mail_sent";
-        
+
         PreparedStatement pstmt = null;
         try {
-            pstmt = db.getConn().prepareStatement("UPDATE "+table+" SET "+field+" = 1 WHERE id = ?;");
+            pstmt = db.getConn().prepareStatement("UPDATE " + table + " SET " + field + " = 1 WHERE id = ?;");
             pstmt.setInt(1, this.getId());
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
         }
-        db.doINSERT(pstmt);    
+        db.doINSERT(pstmt);
         //MPS
         db.closeConn();
     }
-    
 
-	public String getCheck_item_name() {
-		return check_item_name;
-	}
+    public String getCheck_item_name() {
+        return check_item_name;
+    }
 
-	public void setCheck_item_name(String check_item_name) {
-		this.check_item_name = check_item_name;
-	}
+    public void setCheck_item_name(String check_item_name) {
+        this.check_item_name = check_item_name;
+    }
 
-	public String getTicket_ci() {
-		return ticket_ci;
-	}
+    public String getTicket_ci() {
+        return ticket_ci;
+    }
 
-	public void setTicket_ci(String ticket_ci) {
-		this.ticket_ci = ticket_ci;
-	}
+    public void setTicket_ci(String ticket_ci) {
+        this.ticket_ci = ticket_ci;
+    }
 
-	public String getTicket_brief() {
-		return ticket_brief;
-	}
+    public String getTicket_brief() {
+        return ticket_brief;
+    }
 
-	public void setTicket_brief(String ticket_brief) {
-		this.ticket_brief = ticket_brief;
-	}
+    public void setTicket_brief(String ticket_brief) {
+        this.ticket_brief = ticket_brief;
+    }
 }

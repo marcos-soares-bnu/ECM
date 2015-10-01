@@ -75,22 +75,22 @@ public class ChecksExec {
             //Tratamento para cada log:
             switch (objCheck.getId()) {
                 case Constantes.DB_INFRA_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_infra.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_infra_OK.log");
                     break;
                 case Constantes.DB_OTASS_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_otass.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_otass_OK.log");
                     break;
                 case Constantes.DB_DPWIN_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_dpwin.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_dpwin_OK.log");
                     break;
                 case Constantes.DB_SQL_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_sql.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_sql_OK.log");
                     break;
                 case Constantes.DB_FCIR_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_fcir.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_fcir_OK.log");
                     break;
                 case Constantes.DB_PIXCORE_ID:
-                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_pixcore.log");
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_pixcore_OK.log");
                     break;
 
                 default:

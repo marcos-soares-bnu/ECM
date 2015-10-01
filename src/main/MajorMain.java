@@ -15,6 +15,10 @@ public class MajorMain {
         ChangeCheck change = new ChangeCheck(executionTime);
         change.checkChanges();
 
+        if(Constantes.SHOW_OTHER_MESSAGES) {
+            System.out.println("==================================================================================================================================");
+        }
+        
         ChecksExec infra = new ChecksExec(Constantes.DB_INFRA_ID, executionTime);
         //So procede se existem itens (nao esta em change)
         if (infra.getObjCheck().getItens().size() > 0) {
@@ -51,7 +55,11 @@ public class MajorMain {
             pixcore.execCheck();
             pixcore.storeINDB();
         }
-
+        
+        if(Constantes.SHOW_OTHER_MESSAGES) {
+            System.out.println("==================================================================================================================================");
+        }
+        
         //SendMails sendMails = new SendMails();
         //sendMails.startSend();
 
