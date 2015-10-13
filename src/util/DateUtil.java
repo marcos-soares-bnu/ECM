@@ -159,8 +159,8 @@ public class DateUtil {
     }
 
     public Date getFileDateFCIR008(String fileInfo) {
-        String[] str = fileInfo.split("   ");
-        String strDtFull = str[3] + " " + str[4];
+        String[] str = fileInfo.split("        ");
+        String strDtFull = str[1].split("    ")[0];
         Date dt = (Date) this.getFileDateFromString(strDtFull);
         return dt;
     }
