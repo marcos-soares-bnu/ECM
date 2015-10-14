@@ -9,6 +9,7 @@ public class Constantes {
     public static final String DB_CheckConfig_Table = "check_scripts_configs";
     public static final String DB_ChecksOutput_Table = "check_scripts_output";
     public static final String DB_OTASS_Table = "linde_otass";
+    public static final String DB_OTASS013_Table = "otass013_jobs_status";
     
     //CheckScripts
     public static final int DB_INFRA_ID = 1;
