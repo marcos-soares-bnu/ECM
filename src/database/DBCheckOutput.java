@@ -25,8 +25,6 @@ public class DBCheckOutput {
     private Date exec_time;
     private int is_new;
     private int mail_sent;
-
-    //MPS - ini...
     private String check_item_name;
     private String ticket_ci;
     private String ticket_brief;
@@ -42,9 +40,7 @@ public class DBCheckOutput {
     }
 
     public DBCheckOutput() {
-
     }
-    //MPS - fim
 
     public DBCheckOutput(int id, int check_id, int check_item_id, String status, String output_error, Date exec_time, int is_new, int mail_sent) {
         this.id = id;
@@ -154,9 +150,6 @@ public class DBCheckOutput {
         this.mail_sent = mail_sent;
     }
 
-    //==============================================================================
-    // MPS - start...
-    //
     public Map<Integer, DBCheckOutput> DB_retrieveNewErrors() {
         Map<Integer, DBCheckOutput> newErrors = new HashMap<Integer, DBCheckOutput>();
         //metodo para pegar as infos do banco
@@ -167,7 +160,6 @@ public class DBCheckOutput {
 
         //Check if exists last errors 
         if (!strDBLastExec.isEmpty()) {
-            //MPS ini...
             String fields = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_CI as 'Ticket CI', lcitens.ticket_prio as 'Ticket Prio', lcitens.ticket_brief as 'Ticket Brief', outp.output_error as 'Ticket Description'";
             String tables0 = "check_scripts_output outp ";
             String tables1 = "INNER JOIN check_scripts_itens citens ON ";
@@ -177,7 +169,6 @@ public class DBCheckOutput {
             String condition = "outp.status='NOK' AND outp.is_new='1' AND outp.mail_sent='0' AND outp.exec_time = '" + strDBLastExec + "'";
             //
             ResultSet rs = db.doSelect(fields, (tables0 + tables1 + tables2 + tables3 + tables4), condition);
-            //MPS fim...
 
             try {
                 while (rs.next()) {
@@ -195,14 +186,11 @@ public class DBCheckOutput {
                 e.printStackTrace();
                 JOptionPane.showMessageDialog(null, e);
             } finally {
-                //MPS - close
                 db.closeConn();
             }
         }
         return newErrors;
     }
-    // MPS - end...
-    //==============================================================================
 
     public Map<Integer, DBCheckOutput> DB_retrieveLastErrors() {
         Map<Integer, DBCheckOutput> lastErrors = new HashMap<Integer, DBCheckOutput>();
@@ -237,7 +225,6 @@ public class DBCheckOutput {
                     e.printStackTrace();
                     JOptionPane.showMessageDialog(null, e);
                 } finally {
-                    //MPS - close
                     db.closeConn();
                 }
             }
@@ -255,7 +242,6 @@ public class DBCheckOutput {
         String values = "'" + this.getCheck_id() + "'," + "'" + this.getCheck_item_id() + "'," + "'" + this.getStatus() + "'," + "'" + this.getOutput_error() + "'," + "'" + strDate + "'," + this.getIs_new() + "," + this.getMail_sent();
 
         db.doINSERT(table, fields, values);
-        //MPS
         db.closeConn();
     }
 
@@ -283,7 +269,6 @@ public class DBCheckOutput {
         }
 
         db.doINSERT(pstmt);
-        //MPS
         db.closeConn();
     }
 
@@ -300,7 +285,6 @@ public class DBCheckOutput {
             JOptionPane.showMessageDialog(null, e);
         }
         db.doINSERT(pstmt);
-        //MPS
         db.closeConn();
     }
 
