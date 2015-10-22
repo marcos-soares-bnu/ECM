@@ -3,8 +3,9 @@ package OTASS013;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import javax.swing.JOptionPane;
 
@@ -16,7 +17,7 @@ public class DBOTASSJob {
     //Database INFO
     private int id;
     private String jobName;
-    private Map<Integer, DBOTASSJobStatus> statusMap = new HashMap<Integer, DBOTASSJobStatus>();
+    private SortedMap<Integer, DBOTASSJobStatus> statusMap = new TreeMap<Integer, DBOTASSJobStatus>();
 
     //Logic INFO
     private DBUtil db;
@@ -121,7 +122,7 @@ public class DBOTASSJob {
         return statusMap;
     }
 
-    public void setStatusMap(Map<Integer, DBOTASSJobStatus> statusMap) {
+    public void setStatusMap(SortedMap<Integer, DBOTASSJobStatus> statusMap) {
         this.statusMap = statusMap;
     }
 

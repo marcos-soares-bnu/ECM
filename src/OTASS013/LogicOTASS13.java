@@ -1,14 +1,14 @@
 package OTASS013;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 import text.FileReaderUtil;
 import util.Constantes;
 
 public class LogicOTASS13 {
 
-    private Map<String, OBJReadedOTASSJobStatus> readedJobStatusMap = new HashMap<String, OBJReadedOTASSJobStatus>();
+    private SortedMap<String, OBJReadedOTASSJobStatus> readedJobStatusMap = new TreeMap<String, OBJReadedOTASSJobStatus>();
 
     //TestMethod
     public static void main(String[] args) {
@@ -44,7 +44,13 @@ public class LogicOTASS13 {
                 DBOTASSJobStatus DBjobStatus = DBjobINFOs.getStatusMap().values().iterator().next();
                 if (readedStatus.getOutput().equalsIgnoreCase(DBjobStatus.getOutput())) {
                     //Mesmo output, deve ser apenas atualizado o status (full_output)
+                    DBjobStatus.setStatus(readedStatus.getStatus());
+                    DBjobStatus.setOutput(readedStatus.getOutput());
                     DBjobStatus.setFullOutput(readedStatus.getFullOutput());
+                    if (!readedStatus.isError()) {
+                        DBjobStatus.setMailSent(false);
+                    }
+                    
                     //Atualiza as informações
                     DBjobStatus.updateSTATUS();
                 } else {
@@ -68,7 +74,10 @@ public class LogicOTASS13 {
                     }
                     //Se existir um erro igual deve ser atualizado, caso contrario, deve ser inserido um novo status
                     if (statusEncontrado != null) {
+                        statusEncontrado.setStatus(readedStatus.getStatus());
+                        statusEncontrado.setOutput(readedStatus.getOutput());
                         statusEncontrado.setFullOutput(readedStatus.getFullOutput());
+                        
                         //Atualiza as informações
                         statusEncontrado.updateSTATUS();
                     } else {
