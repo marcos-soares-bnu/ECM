@@ -50,7 +50,11 @@ public class SendMails {
 				//Catch the exit code from .bat
 	            if (p2.waitFor() == 0) {
 	                //Mail sent: set mail_sent = 1
-	                out.DB_updateMailSent();
+	            	if (out.getCheck_item_name().equals("OTASS013")) {
+	            		out.DB_updateMailSentOTASS013();
+	            	} else {
+	            		out.DB_updateMailSent();
+	            	}
 	            }
 			} catch (IOException | InterruptedException e) {
 				e.printStackTrace();

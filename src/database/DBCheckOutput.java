@@ -11,11 +11,8 @@ import java.util.Map;
 import javax.swing.JOptionPane;
 
 import util.Constantes;
-import util.DateUtil;
 
 public class DBCheckOutput {
-
-    private DateUtil dtUtil = new DateUtil();
 
     private int id;
     private int check_id;
@@ -160,24 +157,49 @@ public class DBCheckOutput {
 
         //Check if exists last errors 
         if (!strDBLastExec.isEmpty()) {
-            String fields = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_CI as 'Ticket CI', lcitens.ticket_prio as 'Ticket Prio', lcitens.ticket_brief as 'Ticket Brief', outp.output_error as 'Ticket Description'";
-            String tables0 = "check_scripts_output outp ";
-            String tables1 = "INNER JOIN check_scripts_itens citens ON ";
-            String tables2 = "citens.id = outp.check_item_id ";
-            String tables3 = "INNER JOIN linde_check_itens lcitens ON ";
-            String tables4 = "lcitens.code = citens.item_name ";
-            String condition = "outp.status='NOK' AND outp.is_new='1' AND outp.mail_sent='0' AND outp.exec_time = '" + strDBLastExec + "'";
-            //
-            ResultSet rs = db.doSelect(fields, (tables0 + tables1 + tables2 + tables3 + tables4), condition);
+            //Fields for all errors, except OTASS013 errors.
+            String fields_All = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_CI as 'Ticket CI', lcitens.ticket_prio as 'Ticket Prio', lcitens.ticket_brief as 'Ticket Brief', outp.output_error as 'Ticket Description'";
+            String tables0_All = "check_scripts_output outp ";
+            String tables1_All = "INNER JOIN check_scripts_itens citens ON ";
+            String tables2_All = "citens.id = outp.check_item_id ";
+            String tables3_All = "INNER JOIN linde_check_itens lcitens ON ";
+            String tables4_All = "lcitens.code = citens.item_name ";
+            String condition_All = "outp.status='NOK' AND outp.is_new='1' AND outp.mail_sent='0' AND outp.check_item_id <> 35 AND outp.exec_time = '" + strDBLastExec + "'";
+            //ResultSet for all errors, except OTASS013 errors.
+            ResultSet rsAll = db.doSelect(fields_All, (tables0_All + tables1_All + tables2_All + tables3_All + tables4_All), condition_All);
+
+            //Fields for OTASS013 errors.
+            String fields_Otass = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_CI as 'Ticket CI', lcitens.ticket_prio as 'Ticket Prio', lcitens.ticket_brief as 'Ticket Brief', outp.output as 'Ticket Description'";
+            String tables0_Otass = "otass013_jobs_status outp ";
+            String tables1_Otass = "INNER JOIN check_scripts_itens citens ON ";
+            String tables2_Otass = "citens.id = outp.job_id ";
+            String tables3_Otass = "INNER JOIN linde_check_itens lcitens ON ";
+            String tables4_Otass = "lcitens.code = citens.item_name ";
+            String condition_Otass = "outp.status='NOK' AND outp.mail_sent='0'";
+            //ResultSet for OTASS013 errors.
+            ResultSet rsOtass = db.doSelect(fields_Otass, (tables0_Otass + tables1_Otass + tables2_Otass + tables3_Otass + tables4_Otass), condition_Otass);
 
             try {
-                while (rs.next()) {
-                    int id = rs.getInt("outp.id");
-                    String checkItem = rs.getString("Check Item");
-                    String ticketCI = rs.getString("Ticket CI");
-                    String ticketBrief = rs.getString("Ticket Brief");
-                    String ticketDescr = rs.getString("Ticket Description");
-                    int ticketPrio = rs.getInt("Ticket Prio");
+                //At first retrieves all errors not related to OTASS013.
+                while (rsAll.next()) {
+                    int id = rsAll.getInt("outp.id");
+                    String checkItem = rsAll.getString("Check Item");
+                    String ticketCI = rsAll.getString("Ticket CI");
+                    String ticketBrief = rsAll.getString("Ticket Brief");
+                    String ticketDescr = rsAll.getString("Ticket Description");
+                    int ticketPrio = rsAll.getInt("Ticket Prio");
+
+                    DBCheckOutput err = new DBCheckOutput(id, checkItem, ticketCI, ticketBrief, ticketDescr, ticketPrio);
+                    newErrors.put(newErrors.size() + 1, err);
+                }
+                //And here, retrieves only OTASS013 errors.
+                while (rsOtass.next()) {
+                    int id = rsOtass.getInt("outp.id");
+                    String checkItem = rsOtass.getString("Check Item");
+                    String ticketCI = rsOtass.getString("Ticket CI");
+                    String ticketBrief = rsOtass.getString("Ticket Brief");
+                    String ticketDescr = rsOtass.getString("Ticket Description");
+                    int ticketPrio = rsOtass.getInt("Ticket Prio");
 
                     DBCheckOutput err = new DBCheckOutput(id, checkItem, ticketCI, ticketBrief, ticketDescr, ticketPrio);
                     newErrors.put(newErrors.size() + 1, err);
@@ -232,19 +254,6 @@ public class DBCheckOutput {
         return lastErrors;
     }
 
-    @Deprecated
-    public void DB_store_OLD() {
-        //metodo para gravar este item no banco
-        DBUtil db = new DBUtil();
-        String table = Constantes.DB_ChecksOutput_Table;
-        String fields = "check_id, check_item_id, status, output_error, exec_time, is_new, mail_sent";
-        String strDate = dtUtil.getDBFormat(this.getExec_time());
-        String values = "'" + this.getCheck_id() + "'," + "'" + this.getCheck_item_id() + "'," + "'" + this.getStatus() + "'," + "'" + this.getOutput_error() + "'," + "'" + strDate + "'," + this.getIs_new() + "," + this.getMail_sent();
-
-        db.doINSERT(table, fields, values);
-        db.closeConn();
-    }
-
     public void DB_store() {
         //metodo para gravar este item no banco
         DBUtil db = new DBUtil();
@@ -275,6 +284,22 @@ public class DBCheckOutput {
     public void DB_updateMailSent() {
         DBUtil db = new DBUtil();
         String table = Constantes.DB_ChecksOutput_Table;
+        String field = "mail_sent";
+
+        PreparedStatement pstmt = null;
+        try {
+            pstmt = db.getConn().prepareStatement("UPDATE " + table + " SET " + field + " = 1 WHERE id = ?;");
+            pstmt.setInt(1, this.getId());
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+        db.doINSERT(pstmt);
+        db.closeConn();
+    }
+
+    public void DB_updateMailSentOTASS013() {
+        DBUtil db = new DBUtil();
+        String table = Constantes.DB_OTASS013_JOBS_STATUS_Table;
         String field = "mail_sent";
 
         PreparedStatement pstmt = null;

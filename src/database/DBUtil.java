@@ -78,33 +78,6 @@ public class DBUtil {
         return null;
     }
 
-    @Deprecated
-    public void doINSERT(String table, String fields, String values) {
-        String sql = "INSERT INTO " + table;
-
-        if (!fields.isEmpty()) {
-            sql += "(" + fields + ")";
-        }
-        sql += " VALUES (" + values + ");";
-
-        //Testing reasons
-        if (Constantes.SHOW_DB_MESSAGES) {
-            System.out.println(sql);
-        }
-        Statement stmt = null;
-        try {
-            stmt = this.getConn().createStatement();
-            stmt.executeUpdate(sql);
-
-            //best practices JDBC close...
-            stmt.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, e);
-        }
-    }
-
     public String getLastExecTime() {
         String fields = "MAX(exec_time)";
         String table = Constantes.DB_ChecksOutput_Table;
