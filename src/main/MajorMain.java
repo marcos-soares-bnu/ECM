@@ -2,6 +2,7 @@ package main;
 
 import java.util.Date;
 
+import OTASS013.LogicOTASS13;
 import util.Constantes;
 import change.ChangeCheck;
 
@@ -12,13 +13,21 @@ public class MajorMain {
 
         System.out.println("Starting the execution of the SCHEDULED Scripts at:\n" + executionTime);
 
+        if (Constantes.SHOW_OTHER_MESSAGES) {
+            System.out.println("==================================================================================================================================");
+            System.out.println("Executing the Change Verification");
+            System.out.println("==================================================================================================================================");
+        }
+
         ChangeCheck change = new ChangeCheck(executionTime);
         change.checkChanges();
 
-        if(Constantes.SHOW_OTHER_MESSAGES) {
+        if (Constantes.SHOW_OTHER_MESSAGES) {
+            System.out.println("==================================================================================================================================");
+            System.out.println("Executing all the checks");
             System.out.println("==================================================================================================================================");
         }
-        
+
         ChecksExec infra = new ChecksExec(Constantes.DB_INFRA_ID, executionTime);
         //So procede se existem itens (nao esta em change)
         if (infra.getObjCheck().getItens().size() > 0) {
@@ -55,13 +64,31 @@ public class MajorMain {
             pixcore.execCheck();
             pixcore.storeINDB();
         }
-        
-        if(Constantes.SHOW_OTHER_MESSAGES) {
+
+        if (Constantes.SHOW_OTHER_MESSAGES) {
+            System.out.println("==================================================================================================================================");
+            System.out.println("Executing the OTASS013 Verification");
             System.out.println("==================================================================================================================================");
         }
         
-        //SendMails sendMails = new SendMails();
-        //sendMails.startSend();
+        LogicOTASS13 otass013 = new LogicOTASS13();
+        otass013.MainMethod();
+
+        boolean sendMail = false;
+        if (sendMail) {
+            if (Constantes.SHOW_OTHER_MESSAGES) {
+                System.out.println("==================================================================================================================================");
+                System.out.println("Executing the Send Mail");
+                System.out.println("==================================================================================================================================");
+            }
+
+            SendMails sendMails = new SendMails();
+            sendMails.startSend();
+        }
+        
+        if (Constantes.SHOW_OTHER_MESSAGES) {
+            System.out.println("==================================================================================================================================");
+        }
 
         executionTime = new Date();
         System.out.println("Finished the execution of the SCHEDULED Scripts at:\n" + executionTime);

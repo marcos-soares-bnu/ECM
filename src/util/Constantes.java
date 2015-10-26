@@ -51,7 +51,6 @@ public class Constantes {
     public static final boolean LINDE_ENVIRONMENT = false;
     public static final boolean SHOW_DB_MESSAGES = false;
     public static final boolean SHOW_OTHER_MESSAGES = false;
-    public static final boolean IS_TESTING = false;
     public static final int SEC_TIME_WAIT = 3;
     
     //Scheduled Jobs

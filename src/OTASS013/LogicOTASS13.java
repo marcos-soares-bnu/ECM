@@ -25,11 +25,13 @@ public class LogicOTASS13 {
     public void MainLoop() {
         for (OBJReadedOTASSJobStatus readedStatus : readedJobStatusMap.values()) {
             DBOTASSJob DBjobINFOs = new DBOTASSJob(readedStatus.getJobName());
-            System.out.println("=======================================");
-            System.out.println(DBjobINFOs.getId() + " - " + DBjobINFOs.getJobName());
-            System.out.println("=+==+==+==+==+==+==+==+==+==+==+==+==+=");
-            System.out.println(readedStatus.getFullOutput());
-            System.out.println("=+==+==+==+==+==+==+==+==+==+==+==+==+=\n\n\n");
+            if (Constantes.SHOW_OTHER_MESSAGES) {
+                System.out.println("=======================================");
+                System.out.println(DBjobINFOs.getId() + " - " + DBjobINFOs.getJobName());
+                System.out.println("=+==+==+==+==+==+==+==+==+==+==+==+==+=");
+                System.out.println(readedStatus.getFullOutput());
+                System.out.println("=+==+==+==+==+==+==+==+==+==+==+==+==+=");
+            }
 
             //Verifica a quantidade de Status cadastrados para este JOB:
             if (DBjobINFOs.getStatusMap().size() < 1) {
@@ -50,7 +52,7 @@ public class LogicOTASS13 {
                     if (!readedStatus.isError()) {
                         DBjobStatus.setMailSent(false);
                     }
-                    
+
                     //Atualiza as informações
                     DBjobStatus.updateSTATUS();
                 } else {
@@ -77,7 +79,7 @@ public class LogicOTASS13 {
                         statusEncontrado.setStatus(readedStatus.getStatus());
                         statusEncontrado.setOutput(readedStatus.getOutput());
                         statusEncontrado.setFullOutput(readedStatus.getFullOutput());
-                        
+
                         //Atualiza as informações
                         statusEncontrado.updateSTATUS();
                     } else {
