@@ -44,7 +44,7 @@ public class DBUtil {
             stmt = this.getConn().createStatement();
             stmt.executeUpdate(sql);
 
-            //MPS - best practices JDBC close...
+            //best practices JDBC close...
             stmt.close();
 
         } catch (SQLException e) {
@@ -78,34 +78,6 @@ public class DBUtil {
         return null;
     }
 
-    @Deprecated
-    public void doINSERT(String table, String fields, String values) {
-        String sql = "INSERT INTO " + table;
-
-        if (!fields.isEmpty()) {
-            sql += "(" + fields + ")";
-        }
-        sql += " VALUES (" + values + ");";
-
-        //Testing reasons
-        if (Constantes.SHOW_DB_MESSAGES) {
-            System.out.println(sql);
-        }
-        Statement stmt = null;
-        try {
-            stmt = this.getConn().createStatement();
-            stmt.executeUpdate(sql);
-
-            //MPS - best practices JDBC close...
-            stmt.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(null, e);
-        }
-    }
-
-    //MPS - ini...
     public String getLastExecTime() {
         String fields = "MAX(exec_time)";
         String table = Constantes.DB_ChecksOutput_Table;
@@ -125,7 +97,6 @@ public class DBUtil {
         }
         return strExec;
     }
-    //MPS - fim...
 
     public String getLastExecTime(int checkID, Date execTime) {
         String fields = "MAX(exec_time)";
@@ -156,7 +127,7 @@ public class DBUtil {
             }
             pstmt.executeUpdate();
 
-            //MPS - best practices JDBC close...
+            //best practices JDBC close...
             pstmt.close();
 
         } catch (SQLException e) {
@@ -165,7 +136,7 @@ public class DBUtil {
         }
     }
 
-    //MPS - close at the end...
+    //close at the end...
     public void closeConn() {
         try {
             conn.close();
