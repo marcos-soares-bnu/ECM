@@ -89,6 +89,9 @@ public class SendMails {
     
     //Return the xml that is the content of the email to SM9 mail interface
     private String returnXML(String ticketCI, String ticketBrief, String ticketDesc){
+    	ticketDesc = ticketDesc.replace("\n", "|");
+    	ticketDesc = ticketDesc.replace("<", "");
+    	ticketDesc = ticketDesc.replace(">", "");
     	StringBuilder aux_xml = new StringBuilder();
     	aux_xml.append("<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>");
     	aux_xml.append("<DSCEMO>");
@@ -98,7 +101,7 @@ public class SendMails {
     	aux_xml.append("<ASSIGNMENT>SI.DHS.INT.LINDE_IAS_AO_1ST</ASSIGNMENT>");
     	aux_xml.append("<LOGICAL_NAME>" + ticketCI + "</LOGICAL_NAME>");
     	aux_xml.append("<BRIEF_DESCRIPTION>" + ticketBrief + "</BRIEF_DESCRIPTION>");
-    	aux_xml.append("<ACTION>" + ticketDesc.replace("\n", "|") + "</ACTION>");
+    	aux_xml.append("<ACTION>" + ticketDesc + "</ACTION>");
     	aux_xml.append("</DSCEMO>");
     	
     	return aux_xml.toString();
