@@ -38,6 +38,7 @@ public class DBOTASSJob {
         } else {
             System.err.println("JobName is empty.");
         }
+        db.closeConn();
     }
 
     //===================================DB Functions==================================

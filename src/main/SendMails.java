@@ -72,7 +72,8 @@ public class SendMails {
     	    	"echo SET mail_server=smtpeu.linde.grp>> C:\\Temp\\mail.bat",
     	    	"echo SET mail_sender=ixos-admin@Linde-DCM.com>> C:\\Temp\\mail.bat",
     	    	"echo SET mail_target=" + Constantes.MAIL_TARGET + ">> C:\\Temp\\mail.bat",
-    	    	"echo \"%%mail_progr%%\" -f \"%%mail_sender%%\" -t \"%%mail_target%%\" -u %%MAIL_TITLE%% -m %%MAIL%% -s \"%%mail_server%%\">> C:\\Temp\\mail.bat"};
+    	    	"echo SET mail_target_cc=" + Constantes.MAIL_TARGET_CC + ">> C:\\Temp\\mail.bat",
+    	    	"echo \"%%mail_progr%%\" -f \"%%mail_sender%%\" -t \"%%mail_target%%\" -cc \"%%mail_target_cc%%\" -u %%MAIL_TITLE%% -m %%MAIL%% -s \"%%mail_server%%\">> C:\\Temp\\mail.bat"};
     	
     	PrintWriter writer = null;
     	try {

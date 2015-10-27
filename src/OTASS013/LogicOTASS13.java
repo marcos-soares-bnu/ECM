@@ -10,12 +10,6 @@ public class LogicOTASS13 {
 
     private SortedMap<String, OBJReadedOTASSJobStatus> readedJobStatusMap = new TreeMap<String, OBJReadedOTASSJobStatus>();
 
-    //TestMethod
-    public static void main(String[] args) {
-        LogicOTASS13 lOTASS = new LogicOTASS13();
-        lOTASS.MainMethod();
-    }
-
     //===================================Main Methods=================================
     public void MainMethod() {
         this.ReadLog();

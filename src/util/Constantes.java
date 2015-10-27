@@ -46,9 +46,11 @@ public class Constantes {
     
     //Strings SendMail
     public static final String MAIL_TARGET = "IncidentMailService@t-systems.com";
+    public static final String MAIL_TARGET_CC = "FMB-ECM-BR@t-systems.com.br";
     
     //Testing reasons
-    public static final boolean LINDE_ENVIRONMENT = false;
+    public static final boolean LINDE_ENVIRONMENT = true;
+    public static final boolean USE_MAIL_SEND = true;
     public static final boolean SHOW_DB_MESSAGES = false;
     public static final boolean SHOW_OTHER_MESSAGES = false;
     public static final int SEC_TIME_WAIT = 3;
