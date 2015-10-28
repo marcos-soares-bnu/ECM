@@ -175,7 +175,7 @@ public class DBCheckOutput {
             String tables2_Otass = "stats.job_id = jobs.id ";
             String tables3_Otass = "INNER JOIN linde_check_itens lcitens ON ";
             String tables4_Otass = "lcitens.code = 'OTASS013' ";
-            String condition_Otass = "WHERE stats.status='ERROR' AND stats.mail_sent=0";
+            String condition_Otass = "stats.status='ERROR' AND stats.mail_sent=0";
             //ResultSet for OTASS013 errors.
             ResultSet rsOtass = db.doSelect(fields_Otass, (tables0_Otass + tables1_Otass + tables2_Otass + tables3_Otass + tables4_Otass), condition_Otass);
 
