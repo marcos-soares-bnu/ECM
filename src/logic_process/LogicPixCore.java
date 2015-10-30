@@ -169,12 +169,12 @@ public class LogicPixCore extends Logic {
                 if (file.isDirOlderThan8h(dateNOW)) {
                     errors += "\nThe directory is older than 8h:";
                 }
-                //Verificação de se há o .sca
-                if (file.getScaFile() == null) {
-                    errors += "\nThe .sca file is missing:";
+                //Verifica se .sca está ausente por mais de uma hora
+                if (file.isFileMissing(dateNOW, 'S')) {
+                    errors += "\nThe .sca file is missing for more than 1h:";
                 }
-                //Verificação de se o .imp é mais velho q 1h
-                if (file.isImpMissing(dateNOW)) {
+                //Verifica se .imp está ausente por mais de uma hora
+                if (file.isFileMissing(dateNOW, 'I')) {
                     errors += "\nThe .imp file is missing for more than 1h:";
                 }
             } else {

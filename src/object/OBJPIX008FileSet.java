@@ -64,12 +64,20 @@ public class OBJPIX008FileSet {
         return isOlder;
     }
     
-    public boolean isImpMissing(Date timeNow) {
+    //Send 'S' as 2nd argument for '.sca' or 'I' for '.imp' files
+    public boolean isFileMissing(Date timeNow, char typeOfFile) {
         boolean isMissing = false;
+        String getFile = null;
         
-        if (this.getImpFile() != null) {
+        if(typeOfFile == 'S')
+            getFile = this.getScaFile();
+        else if(typeOfFile == 'I')
+            getFile = this.getImpFile();
+        
+        if (getFile != null) {
             isMissing = false;
         } else {
+            //If the file doesn't exists, check if the directory is older than one hour
             long hDiff = dtUtil.getHoursDif(this.getDirDate(), timeNow);
             if (hDiff > 1) {
                 isMissing = true;
@@ -78,7 +86,7 @@ public class OBJPIX008FileSet {
         
         return isMissing;
     }
-    
+        
     public String toString() {
         String strInfos = "";
         if (this.getDirectory() != null && !this.getDirectory().isEmpty()) {
