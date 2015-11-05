@@ -151,15 +151,18 @@ public class ChecksExec {
                         //record list of New Errors/Exists on DB...
                         this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
                     } else if (cItem.getItemName().equals("OTASS012")) {
-                        this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
+//                        this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
+                        this.checkOtass012IsNewError(checkID, checkItemID, err, exec_time, status);
                     } else if (cItem.getItemName().equals("OTASS013")) {
                         this.checkOtass013IsNewError(checkID, checkItemID, err, exec_time, status);
                     } else if (cItem.getItemName().equals("DPWIN001") || cItem.getItemName().equals("DPWIN002")) {
                         //record list of New Errors/Exists on DB...
                         this.recordArrCheckIsNewErrorTasks(checkID, checkItemID, err, exec_time, status);
-                    }
-                    //MPS - Checks manually implemented...multiple tickets per Batches...  
+                    } //else if (cItem.getItemName().equals("FCIR004")) {
+//                        this.checkFCIR004IsNewError(checkID, checkItemID, err, exec_time, status);
+//                    }
                     else if (cItem.getItemName().equals("FCIR005") || cItem.getItemName().equals("PIX014")) {
+                        //MPS - Checks manually implemented...multiple tickets per Batches...  
                         this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
                     } else {
                         int isNew = this.checkIsNewError(checkID, checkItemID, err) ? 1 : 0;
@@ -195,6 +198,42 @@ public class ChecksExec {
             }
         }
         return isNew;
+    }
+    
+    private void checkFCIR004IsNewError(int checkID, int checkItemID, OBJCheckOutput err, Date exec_time, String status) {
+        //Tratamento especial para erros detectados no logfile "ix_exf"
+        if (err.getOutput_error().contains("ix_exf.log")) {
+            for (DBCheckOutput out : dbLastErrors.values()) {
+                if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
+                    //Pega somente o erro reportado, ignorando data/hora e número de task
+                    String saidaAtualTruncada = err.getOutput_error().substring(21, err.getOutput_error().indexOf("#"));
+                    
+                }
+            }
+        } else {
+            
+        }
+    }
+    
+    private void checkOtass012IsNewError(int checkID, int checkItemID, OBJCheckOutput err, Date exec_time, String status) {
+        for (DBCheckOutput out : dbLastErrors.values()) {
+            if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
+                //Utiliza as informações de indice abaixo para extrair somente nome do pool reportado
+                int indicePrimeiroParentese = out.getOutput_error().indexOf("(");
+                int indiceSegundoParentese = out.getOutput_error().indexOf(")");
+                //Nome do pool apresentando erro atualmente
+                String nomeDoPool = err.getOutput_error().substring(indicePrimeiroParentese, indiceSegundoParentese);
+                if (out.getOutput_error().contains(nomeDoPool)) {
+                    //Se o erro atual se refere ao mesmo erro da verif. anterior, insere como erro não-novo
+                    DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 0); //isNew=0);
+                    dbOutput.DB_store();
+                } else {
+                    //Senão insere como erro novo
+                    DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 1); //isNew=1);
+                    dbOutput.DB_store();
+                }
+            }
+        }
     }
 
     private void checkOtass013IsNewError(int checkID, int checkItemID, OBJCheckOutput err, Date exec_time, String status) {
