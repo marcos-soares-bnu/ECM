@@ -92,6 +92,7 @@ public class SendMails {
     	ticketDesc = ticketDesc.replace("\n", "|");
     	ticketDesc = ticketDesc.replace("<", "");
     	ticketDesc = ticketDesc.replace(">", "");
+    	ticketDesc = ticketDesc.replace("%", "percent");
     	StringBuilder aux_xml = new StringBuilder();
     	aux_xml.append("<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>");
     	aux_xml.append("<DSCEMO>");
