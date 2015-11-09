@@ -150,6 +150,8 @@ public class ChecksExec {
 
                         //record list of New Errors/Exists on DB...
                         this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
+                    }else if (cItem.getItemName().equals("OTASS002")) {
+                        this.checkOtass002IsNewError(checkID, checkItemID, err, exec_time, status);
                     } else if (cItem.getItemName().equals("OTASS012")) {
 //                        this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
                         this.checkOtass012IsNewError(checkID, checkItemID, err, exec_time, status);
@@ -207,11 +209,30 @@ public class ChecksExec {
                 if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
                     //Pega somente o erro reportado, ignorando data/hora e número de task
                     String saidaAtualTruncada = err.getOutput_error().substring(21, err.getOutput_error().indexOf("#"));
-                    
                 }
             }
         } else {
             
+        }
+    }
+    
+    private void checkOtass002IsNewError(int checkID, int checkItemID, OBJCheckOutput err, Date exec_time, String status) {
+        for (DBCheckOutput out : dbLastErrors.values()) {
+            if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
+              //Utiliza a informação de indice abaixo para extrair somente nome do pool reportado
+                int indicePrimeiroEspaco = out.getOutput_error().indexOf(" ");
+                //Nome do pool apresentando erro atualmente
+                String nomeDoPool = err.getOutput_error().substring(0, indicePrimeiroEspaco);
+                if (out.getOutput_error().contains(nomeDoPool)) {
+                  //Se o erro atual se refere ao mesmo erro da verif. anterior, insere como erro não-novo
+                    DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 0); //isNew=0);
+                    dbOutput.DB_store();
+                } else {
+                  //Senão insere como erro novo
+                    DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 1); //isNew=1);
+                    dbOutput.DB_store();
+                }
+            }
         }
     }
     
