@@ -160,9 +160,9 @@ public class ChecksExec {
                     } else if (cItem.getItemName().equals("DPWIN001") || cItem.getItemName().equals("DPWIN002")) {
                         //record list of New Errors/Exists on DB...
                         this.recordArrCheckIsNewErrorTasks(checkID, checkItemID, err, exec_time, status);
-                    } //else if (cItem.getItemName().equals("FCIR004")) {
-//                        this.checkFCIR004IsNewError(checkID, checkItemID, err, exec_time, status);
-//                    }
+                    } else if (cItem.getItemName().equals("FCIR004")) {
+                        this.checkFCIR004IsNewError(checkID, checkItemID, err, exec_time, status);
+                    }
                     else if (cItem.getItemName().equals("FCIR005") || cItem.getItemName().equals("PIX014")) {
                         //MPS - Checks manually implemented...multiple tickets per Batches...  
                         this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
@@ -203,16 +203,48 @@ public class ChecksExec {
     }
     
     private void checkFCIR004IsNewError(int checkID, int checkItemID, OBJCheckOutput err, Date exec_time, String status) {
-        //Tratamento especial para erros detectados no logfile "ix_exf"
+        //Tratamento específico para erros detectados no logfile "ix_exf"
         if (err.getOutput_error().contains("ix_exf.log")) {
+            //Array para guardar os erros novos.
+            String[] errosNovos = err.getOutput_error().split("\n");
+            //ArrayList que recebe todos os erros antigos
+            List<String> errosAntigosFullname = new ArrayList<String>();
             for (DBCheckOutput out : dbLastErrors.values()) {
                 if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
-                    //Pega somente o erro reportado, ignorando data/hora e número de task
-                    String saidaAtualTruncada = err.getOutput_error().substring(21, err.getOutput_error().indexOf("#"));
+                    //Só adiciona no ArrayList, erros referentes ao FCIR004 e ao logfile "ix_exf"
+                    if (out.getOutput_error().contains("ix_exf.log")) {
+                        errosAntigosFullname.add(out.getOutput_error());
+                    }
                 }
             }
+            //Percorre cada erro novo, comparando-o com erros antigos
+            for (int j = 0; j < errosNovos.length; j++) {
+                //Guarda somente dados relevantes, desprezando data/hora e task number
+                String erroNovoPartname =  errosNovos[j].substring(err.getOutput_error().indexOf("\\"), err.getOutput_error().indexOf("#"));
+                //Se há erros antigos, então os atuais têm de ser comparados
+                if (!errosAntigosFullname.isEmpty()) {
+                    for (int i = 0; i < errosAntigosFullname.size(); i++) {
+                        if (errosAntigosFullname.get(i).contains(erroNovoPartname)) {
+                            //Se o erro atual se refere ao mesmo erro da verif. anterior, insere como erro antigo
+                            DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 0); //isNew=0);
+                            dbOutput.DB_store();
+                        } else {
+                            //Senão insere como erro novo
+                            DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 1); //isNew=1);
+                            dbOutput.DB_store();
+                        }
+                    }
+                    //Se não há erros antigos, o erro atual pode ser inserido com isNew=1
+                } else {
+                    DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 1); //isNew=1);
+                    dbOutput.DB_store();
+                }
+            }
+            //Tratamento geral para outros tipos de logfile
         } else {
-            
+            int isNew = this.checkIsNewError(checkID, checkItemID, err) ? 1 : 0;
+            DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, isNew);
+            dbOutput.DB_store();
         }
     }
     
