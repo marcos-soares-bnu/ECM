@@ -93,6 +93,9 @@ public class ChecksExec {
                 case Constantes.DB_PIXCORE_ID:
                     dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_pixcore_OK.log");
                     break;
+                case Constantes.DB_ICC_ID:
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_icc.log");
+                    break;
 
                 default:
                     break;

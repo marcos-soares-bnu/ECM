@@ -19,6 +19,7 @@ public class Constantes {
     public static final int DB_SQL_ID = 4;
     public static final int DB_FCIR_ID = 5;
     public static final int DB_PIXCORE_ID = 6;
+    public static final int DB_ICC_ID = 7;
     
     //String utils
     public static final String STRING_CHECKS = "----------------------CHECKS------------------------------";
@@ -49,8 +50,8 @@ public class Constantes {
     public static final String MAIL_TARGET_CC = "FMB-ECM-BR@t-systems.com.br";
     
     //Testing reasons
-    public static final boolean LINDE_ENVIRONMENT = true;
-    public static final boolean USE_MAIL_SEND = true;
+    public static final boolean LINDE_ENVIRONMENT = false;//true;
+    public static final boolean USE_MAIL_SEND = false;//true;
     public static final boolean SHOW_DB_MESSAGES = false;
     public static final boolean SHOW_OTHER_MESSAGES = false;
     public static final int SEC_TIME_WAIT = 3;
