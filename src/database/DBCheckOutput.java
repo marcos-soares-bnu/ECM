@@ -162,7 +162,7 @@ public class DBCheckOutput {
             String tables0_All = "check_scripts_output outp ";
             String tables1_All = "INNER JOIN check_scripts_itens citens ON ";
             String tables2_All = "citens.id = outp.check_item_id ";
-            String tables3_All = "INNER JOIN check_scripts_tickets lcitens ON ";
+            String tables3_All = "INNER JOIN check_scripts_tickets_config lcitens ON ";
             String tables4_All = "lcitens.check_item_id = citens.id ";
             String condition_All = "outp.status='NOK' AND outp.is_new='1' AND outp.mail_sent='0' AND outp.check_item_id <> 35 AND outp.exec_time = '" + strDBLastExec + "'";
             //ResultSet for all errors, except OTASS013 errors.
