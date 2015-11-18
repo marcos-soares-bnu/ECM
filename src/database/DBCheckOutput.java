@@ -158,7 +158,7 @@ public class DBCheckOutput {
         //Check if exists last errors 
         if (!strDBLastExec.isEmpty()) {
             //Fields for all errors, except OTASS013 errors.
-            String fields_All = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_ci as 'Ticket CI', lcitens.ticket_prio as 'Ticket Prio', lcitens.ticket_brief as 'Ticket Brief', outp.output_error as 'Ticket Description'";
+            String fields_All = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_ci as 'Ticket CI', lcitens.item_prio as 'Ticket Prio', lcitens.ticket_brief as 'Ticket Brief', outp.output_error as 'Ticket Description'";
             String tables0_All = "check_scripts_output outp ";
             String tables1_All = "INNER JOIN check_scripts_itens citens ON ";
             String tables2_All = "citens.id = outp.check_item_id ";
