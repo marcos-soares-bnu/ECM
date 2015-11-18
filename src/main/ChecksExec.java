@@ -203,47 +203,65 @@ public class ChecksExec {
     }
     
     private void checkFCIR004IsNewError(int checkID, int checkItemID, OBJCheckOutput err, Date exec_time, String status) {
+        String errosNovosDB = "";
+        String errosAntigosDB = "";
         //Tratamento específico para erros detectados no logfile "ix_exf"
         if (err.getOutput_error().contains("ix_exf.log")) {
             //Array para guardar os erros novos.
-            String[] errosNovos = err.getOutput_error().split("\n");
+            String[] errosAtuais = err.getOutput_error().split("\n");
             //ArrayList que recebe todos os erros antigos
             List<String> errosAntigosFullname = new ArrayList<String>();
             for (DBCheckOutput out : dbLastErrors.values()) {
                 if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
                     //Só adiciona no ArrayList, erros referentes ao FCIR004 e ao logfile "ix_exf"
-                    if (out.getOutput_error().contains("ix_exf.log")) {
                         errosAntigosFullname.add(out.getOutput_error());
-                    }
                 }
             }
             //Percorre cada erro novo, comparando-o com erros antigos
-            for (int j = 0; j < errosNovos.length; j++) {
+            for (int j = 0; j < errosAtuais.length; j++) {
                 //Guarda somente dados relevantes, desprezando data/hora e task number
-                String erroNovoPartname =  errosNovos[j].substring(err.getOutput_error().indexOf("\\"), err.getOutput_error().indexOf("#"));
+                String erroNovoPartname;
+                if (errosAtuais[j].contains("Warning"))
+                    erroNovoPartname = errosAtuais[j].substring(err.getOutput_error().indexOf(".log"));
+                else
+                    erroNovoPartname =  errosAtuais[j].substring(err.getOutput_error().indexOf("\\"), err.getOutput_error().indexOf("#"));
                 //Se há erros antigos, então os atuais têm de ser comparados
                 if (!errosAntigosFullname.isEmpty()) {
+                    boolean ehAntigo = false;
                     for (int i = 0; i < errosAntigosFullname.size(); i++) {
                         if (errosAntigosFullname.get(i).contains(erroNovoPartname)) {
                             //Se o erro atual se refere ao mesmo erro da verif. anterior, insere como erro antigo
-                            DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 0); //isNew=0);
-                            dbOutput.DB_store();
-                        } else {
-                            //Senão insere como erro novo
-                            DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 1); //isNew=1);
-                            dbOutput.DB_store();
+                            errosAntigosDB += "\n"+errosAtuais[j];
+                            ehAntigo = true;
                         }
                     }
+                    if (!ehAntigo)
+                        errosNovosDB += "\n"+errosAtuais[j];
                     //Se não há erros antigos, o erro atual pode ser inserido com isNew=1
                 } else {
-                    DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 1); //isNew=1);
-                    dbOutput.DB_store();
+                    errosNovosDB += "\n"+errosAtuais[j];
                 }
             }
             //Tratamento geral para outros tipos de logfile
         } else {
-            int isNew = this.checkIsNewError(checkID, checkItemID, err) ? 1 : 0;
-            DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, isNew);
+            
+            if (this.checkIsNewError(checkID, checkItemID, err)) {
+                errosNovosDB += "\n"+err.getOutput_error();
+            } else {
+                errosAntigosDB += "\n"+err.getOutput_error();
+            }
+        }
+        
+        if (errosNovosDB.length() > 0) {
+            errosNovosDB.trim();
+            //Insere os erros novos no BD
+            DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, errosNovosDB, exec_time, 1);
+            dbOutput.DB_store();
+        }
+        if (errosAntigosDB.length() > 0) {
+            errosAntigosDB.trim();
+            //Insere os erros antigos no BD
+            DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, errosAntigosDB, exec_time, 0);
             dbOutput.DB_store();
         }
     }
