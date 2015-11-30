@@ -43,8 +43,6 @@ public class DBUtil {
         try {
             stmt = this.getConn().createStatement();
             stmt.executeUpdate(sql);
-
-            //best practices JDBC close...
             stmt.close();
 
         } catch (SQLException e) {

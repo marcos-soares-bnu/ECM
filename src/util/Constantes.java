@@ -51,7 +51,7 @@ public class Constantes {
     public static final String MAIL_TARGET_CC = "FMB-ECM-BR@t-systems.com.br";
     
     //Testing reasons
-    public static final boolean LINDE_CMDS_INTERVAL = true;
+    public static final boolean LINDE_CMDS_INTERVAL = false;
     //
     public static final boolean LINDE_ENVIRONMENT = false;//true;
     public static final boolean USE_MAIL_SEND = false;//true;

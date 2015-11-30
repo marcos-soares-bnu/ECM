@@ -58,6 +58,15 @@ public class ECMchecksCmds {
 		this.cmdh			= new CmdsHandler();
 		this.lstCmds 		= this.cmdh.selectCmds(this.check_cd);
 	}
+	
+	//Test for each item
+	public ECMchecksCmds(String check_cd, String code, String path_out) {
+        super();
+        this.path_out       = path_out;
+        this.check_cd       = check_cd;
+        this.cmdh           = new CmdsHandler();
+        this.lstCmds        = this.cmdh.selectCmds(this.check_cd, code);
+    }
 
 	
 	private List<String> getListInternCmds(String aux_cmdr, String sep, int MAXCOL)

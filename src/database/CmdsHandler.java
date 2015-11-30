@@ -150,6 +150,37 @@ public class CmdsHandler {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List<List<String>> selectCmds(String check_cd, String code) {
+        ResultSet rs;
+        String where = "check_cd = '" + check_cd + "' AND code = '" + code + "'";
+        where += " order by code ASC";
+        
+        rs = db.doSelect("*", Constantes.DB_ChecksCmds_Table, where);
+        try {
+                int numcols = rs.getMetaData().getColumnCount();
+                List <List <String> > result = new ArrayList<>();
+
+                while (rs.next())
+                {
+                    List <String> row = new ArrayList<>(numcols); // new list per row
+
+                    for (int i=1; i<= numcols; i++) {  // don't skip the last column, use <=
+                        row.add(rs.getString(i));
+                        //System.out.print(rs.getString(i) + "\t");
+                    }
+                    result.add(row); // add it to the result
+                    //System.out.print("\n");
+                }           
+                return result;
+                
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            return null;
+        }
     }	
 	
 	
