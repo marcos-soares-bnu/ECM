@@ -70,9 +70,7 @@ public class ChecksExec {
                 this.callCMD(new DecryptOTASS().getUserandPass());
             } else {
                 //Else, call standard implementation
-//TESTE MPS            	
-//                this.callCMD();
-                dbCheckConfig.setPath_output("D:\\IAS_Monitoring\\APP_Dev\\SCHEDScripts\\Testes\\MPS\\mps_dpwin.log");
+                this.callCMD();
             }
         } else {
             //Tratamento para cada log:
