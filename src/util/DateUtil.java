@@ -73,6 +73,14 @@ public class DateUtil {
         return (d2.getTime() - d1.getTime()) / 3600000;
     }
 
+    public boolean moreThanXminutes(Date nowDate, Date fileDate, int XMinutes) {
+        long minutes = 60 * (nowDate.getTime() - fileDate.getTime()) / 3600000;
+        if (minutes >= XMinutes) {
+            return true;
+        }
+        return false;
+    }
+    
     public boolean moreThanXhours(Date nowDate, Date fileDate, int XHours) {
         long horas = (nowDate.getTime() - fileDate.getTime()) / 3600000;
         if (horas >= XHours) {
@@ -164,7 +172,13 @@ public class DateUtil {
         Date dt = (Date) this.getFileDateFromString(strDtFull);
         return dt;
     }
-
+    
+    public Date getFileDateDPWIN006(String fileInfo) {
+        String[] str = fileInfo.split("    ");
+        Date dt = (Date) this.getFileDateFromString(str[0]);
+        return dt;
+    }
+    
     public Date getFileDateDPWIN007(String fileInfo) {
         String[] str = fileInfo.split("    ");
         Date dt = (Date) this.getFileDateFromString(str[0]);
