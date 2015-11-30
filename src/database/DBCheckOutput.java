@@ -169,13 +169,13 @@ public class DBCheckOutput {
             ResultSet rsAll = db.doSelect(fields_All, (tables0_All + tables1_All + tables2_All + tables3_All + tables4_All), condition_All);
 
             //Fields for OTASS013 errors.
-            String fields_Otass = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_CI as 'Ticket CI', lcitens.ticket_prio as 'Ticket Prio', lcitens.ticket_brief as 'Ticket Brief', outp.output as 'Ticket Description'";
-            String tables0_Otass = "otass013_jobs_status outp ";
-            String tables1_Otass = "INNER JOIN check_scripts_itens citens ON ";
-            String tables2_Otass = "citens.id = outp.job_id ";
+            String fields_Otass = "stats.id, jobs.job_name as'Job Name', stats.full_output as 'Ticket Description', lcitens.ticket_brief as 'Ticket Brief', lcitens.ticket_CI as 'Ticket CI', lcitens.ticket_prio as 'Ticket Prio'";
+            String tables0_Otass = "otass013_jobs_status stats ";
+            String tables1_Otass = "INNER JOIN otass_jobs jobs ON ";
+            String tables2_Otass = "stats.job_id = jobs.id ";
             String tables3_Otass = "INNER JOIN linde_check_itens lcitens ON ";
-            String tables4_Otass = "lcitens.code = citens.item_name ";
-            String condition_Otass = "outp.status='NOK' AND outp.mail_sent='0'";
+            String tables4_Otass = "lcitens.code = 'OTASS013' ";
+            String condition_Otass = "stats.status='ERROR' AND stats.mail_sent=0";
             //ResultSet for OTASS013 errors.
             ResultSet rsOtass = db.doSelect(fields_Otass, (tables0_Otass + tables1_Otass + tables2_Otass + tables3_Otass + tables4_Otass), condition_Otass);
 
@@ -194,10 +194,10 @@ public class DBCheckOutput {
                 }
                 //And here, retrieves only OTASS013 errors.
                 while (rsOtass.next()) {
-                    int id = rsOtass.getInt("outp.id");
-                    String checkItem = rsOtass.getString("Check Item");
+                    int id = rsOtass.getInt("stats.id");
+                    String checkItem = "OTASS013"; //manual
                     String ticketCI = rsOtass.getString("Ticket CI");
-                    String ticketBrief = rsOtass.getString("Ticket Brief");
+                    String ticketBrief = rsOtass.getString("Ticket Brief").replace("JOBNAME", rsOtass.getString("Job Name"));
                     String ticketDescr = rsOtass.getString("Ticket Description");
                     int ticketPrio = rsOtass.getInt("Ticket Prio");
 

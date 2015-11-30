@@ -78,6 +78,33 @@ public class DBUtil {
         return null;
     }
 
+    public String getAgeCheckLastExec(String code)
+    {
+        String fields = "(TIME_TO_SEC(TIMEDIFF(NOW(), lastexec)) / 60)";
+        String table = Constantes.DB_ChecksCmds_Table;
+        String condition = "code = '" + code + "'";
+        ResultSet rs = this.doSelect(fields, table, condition);
+
+        String strExec = "";
+        try
+        {
+            if (rs.next())
+            {
+                String lastexec = rs.getString(1);
+                if (lastexec != null)	{ strExec = lastexec; }
+                else					{ strExec = "999999"; }
+            }
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
+            strExec = "999999";
+        }
+        if (strExec.equals(""))	{ strExec = "999999"; }        
+        return strExec;
+    }
+    
+
     public String getLastExecTime() {
         String fields = "MAX(exec_time)";
         String table = Constantes.DB_ChecksOutput_Table;

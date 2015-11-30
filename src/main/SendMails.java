@@ -72,7 +72,8 @@ public class SendMails {
     	    	"echo SET mail_server=smtpeu.linde.grp>> C:\\Temp\\mail.bat",
     	    	"echo SET mail_sender=ixos-admin@Linde-DCM.com>> C:\\Temp\\mail.bat",
     	    	"echo SET mail_target=" + Constantes.MAIL_TARGET + ">> C:\\Temp\\mail.bat",
-    	    	"echo \"%%mail_progr%%\" -f \"%%mail_sender%%\" -t \"%%mail_target%%\" -u %%MAIL_TITLE%% -m %%MAIL%% -s \"%%mail_server%%\">> C:\\Temp\\mail.bat"};
+    	    	"echo SET mail_target_cc=" + Constantes.MAIL_TARGET_CC + ">> C:\\Temp\\mail.bat",
+    	    	"echo \"%%mail_progr%%\" -f \"%%mail_sender%%\" -t \"%%mail_target%%\" -cc \"%%mail_target_cc%%\" -u %%MAIL_TITLE%% -m %%MAIL%% -s \"%%mail_server%%\">> C:\\Temp\\mail.bat"};
     	
     	PrintWriter writer = null;
     	try {
@@ -88,6 +89,10 @@ public class SendMails {
     
     //Return the xml that is the content of the email to SM9 mail interface
     private String returnXML(String ticketCI, String ticketBrief, String ticketDesc){
+    	ticketDesc = ticketDesc.replace("\n", "|");
+    	ticketDesc = ticketDesc.replace("<", "");
+    	ticketDesc = ticketDesc.replace(">", "");
+    	ticketDesc = ticketDesc.replace("%", "percent");
     	StringBuilder aux_xml = new StringBuilder();
     	aux_xml.append("<?xml version=\\\"1.0\\\" encoding=\\\"UTF-8\\\"?>");
     	aux_xml.append("<DSCEMO>");
@@ -97,7 +102,7 @@ public class SendMails {
     	aux_xml.append("<ASSIGNMENT>SI.DHS.INT.LINDE_IAS_AO_1ST</ASSIGNMENT>");
     	aux_xml.append("<LOGICAL_NAME>" + ticketCI + "</LOGICAL_NAME>");
     	aux_xml.append("<BRIEF_DESCRIPTION>" + ticketBrief + "</BRIEF_DESCRIPTION>");
-    	aux_xml.append("<ACTION>" + ticketDesc.replace("\n", "|") + "</ACTION>");
+    	aux_xml.append("<ACTION>" + ticketDesc + "</ACTION>");
     	aux_xml.append("</DSCEMO>");
     	
     	return aux_xml.toString();

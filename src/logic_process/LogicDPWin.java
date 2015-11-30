@@ -30,4 +30,25 @@ public class LogicDPWin extends Logic {
             checkInfos.setError("");
         }
     }
+    
+    public void DPWIN006(TXTCheck checkInfos, Date timeNOW) {
+        String[] arrFiles = checkInfos.getError().split("\nTaskName:");
+        Map<Integer, String> errorsMap = new HashMap<Integer, String>();
+
+        //Array 0 virá vazio
+        //Preenche o mapa de erros
+        for (int i = 1; i < arrFiles.length; i++) {
+            if (dtUtil.moreThanXminutes(timeNOW, dtUtil.getFileDateDPWIN006(arrFiles[i]), 30)) { //30min
+                errorsMap.put(errorsMap.size(), arrFiles[i]);
+            }
+        }
+
+        if (errorsMap.size() > 0) {
+            //Create the error string
+            checkInfos.setError(this.createErrorString(errorsMap));
+        } else {
+            checkInfos.setError("");
+        }
+    }
+    
 }

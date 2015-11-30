@@ -11,6 +11,7 @@ public class Constantes {
     public static final String DB_OTASS_Table = "linde_otass";
     public static final String DB_OTASS_JOBS_Table = "otass_jobs";
     public static final String DB_OTASS013_JOBS_STATUS_Table = "otass013_jobs_status";
+    public static final String DB_ChecksCmds_Table = "linde_mps_cmds";
     
     //CheckScripts
     public static final int DB_INFRA_ID = 1;
@@ -19,6 +20,7 @@ public class Constantes {
     public static final int DB_SQL_ID = 4;
     public static final int DB_FCIR_ID = 5;
     public static final int DB_PIXCORE_ID = 6;
+    public static final int DB_ICC_ID = 7;
     
     //String utils
     public static final String STRING_CHECKS = "----------------------CHECKS------------------------------";
@@ -46,9 +48,13 @@ public class Constantes {
     
     //Strings SendMail
     public static final String MAIL_TARGET = "IncidentMailService@t-systems.com";
+    public static final String MAIL_TARGET_CC = "FMB-ECM-BR@t-systems.com.br";
     
     //Testing reasons
-    public static final boolean LINDE_ENVIRONMENT = false;
+    public static final boolean LINDE_CMDS_INTERVAL = true;
+    //
+    public static final boolean LINDE_ENVIRONMENT = false;//true;
+    public static final boolean USE_MAIL_SEND = false;//true;
     public static final boolean SHOW_DB_MESSAGES = false;
     public static final boolean SHOW_OTHER_MESSAGES = false;
     public static final int SEC_TIME_WAIT = 3;
