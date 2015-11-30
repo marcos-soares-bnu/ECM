@@ -14,73 +14,8 @@ public class ECMchecksCmds {
 
 	public String path_out;
 	public String check_cd;
-	public String otass_lastid;
-	//
-	public String unix_usr = "ixosadm";
-	public String unix_pwd = "soxi0401";
-	public String unix_hst = "iasp.edc.linde.grp";
-	//
-	public String sql_usr = "ecr_monitoring";
-	public String sql_pwd = "ecr0401_monitoring";
-	public String sql_hst = "ECR_iasp";
 	//
 	private CmdsHandler cmdh;
-	//
-	public String getUnix_usr() {
-		return unix_usr;
-	}
-
-	public String getOtass_lastid() {
-		return otass_lastid;
-	}
-
-	public void setOtass_lastid(String otass_lastid) {
-		this.otass_lastid = otass_lastid;
-	}
-
-	public void setUnix_usr(String unix_usr) {
-		this.unix_usr = unix_usr;
-	}
-
-	public String getUnix_pwd() {
-		return unix_pwd;
-	}
-
-	public void setUnix_pwd(String unix_pwd) {
-		this.unix_pwd = unix_pwd;
-	}
-
-	public String getUnix_hst() {
-		return unix_hst;
-	}
-
-	public void setUnix_hst(String unix_hst) {
-		this.unix_hst = unix_hst;
-	}
-
-	public String getSql_usr() {
-		return sql_usr;
-	}
-
-	public void setSql_usr(String sql_usr) {
-		this.sql_usr = sql_usr;
-	}
-
-	public String getSql_pwd() {
-		return sql_pwd;
-	}
-
-	public void setSql_pwd(String sql_pwd) {
-		this.sql_pwd = sql_pwd;
-	}
-
-	public String getSql_hst() {
-		return sql_hst;
-	}
-
-	public void setSql_hst(String sql_hst) {
-		this.sql_hst = sql_hst;
-	}
 	//
 	private List <List <String> > lstCmds = new ArrayList<>();
 	
@@ -122,26 +57,37 @@ public class ECMchecksCmds {
 		this.check_cd		= check_cd;
 		this.cmdh			= new CmdsHandler();
 		this.lstCmds 		= this.cmdh.selectCmds(this.check_cd);
-		this.otass_lastid	= this.cmdh.selectLastID();
 	}
 
 	
-	private void treatInternCmds(String aux_cmdr)
+	private List<String> getListInternCmds(String aux_cmdr, String sep, int MAXCOL)
 	{
-		String[] aux_vetCmdsInt = aux_cmdr.split("@@|##");
+		String[] aux_vetCmdsInt = aux_cmdr.split(sep);
 		List<String> vetCmdsInt = new ArrayList<String>(); 
 
-		for (String s : vetCmdsInt)
+		for (String s : aux_vetCmdsInt)
 		{
-			if (s.length() <= 20)
+			if ( (s.length() > 1) && (s.length() <= MAXCOL) && (s.indexOf("\n") == -1) )
 				vetCmdsInt.add(s);
 		}
-		//
-		for (String string : vetCmdsInt)
-		{
-			
-		}
+		return vetCmdsInt;
 	}
+	
+	private String changeParams(CmdsHandler cmdhi, String aux_in)
+	{
+    	//Treat intern parameters and Replace for database values...
+    	if (aux_in.indexOf("%P%") > 0)
+    	{
+        	List<String> vParamInt	= getListInternCmds(aux_in, "%P%|##", 20); 
+    		for (String s : vParamInt)
+    		{
+    			String aux_parval	= cmdhi.selectCmdBody("-1", s);
+    			aux_in				= aux_in.replace("%P%" + s + "##", aux_parval);
+    		}
+    	}
+		return aux_in;
+	}
+	
 	
 	public void callCmdsInterval() throws IOException
 	{
@@ -159,11 +105,25 @@ public class ECMchecksCmds {
         	//Change @LOGFILE to path_out...   
         	String aux_cmdr		= aux_cmde.replace("@LOGFILE", (aux_path + "." + this.check_cd));
 
+        	//Treat intern parameters and Replace for database values...
+        	aux_cmdr			= changeParams(cmdhi, aux_cmdr);
+        	
         	//Treat the intern Unix call sql/shell commands to save locally...
         	if (aux_cmdr.indexOf("@@") > 0)
         	{
-        		treatInternCmds(aux_cmdr);
-        		aux_cmdr		= aux_cmdr.replace("@@", "").replace("##", ""); 
+            	List<String> vCmdsInt	= getListInternCmds(aux_cmdr, "@@|##", 20); 
+        		aux_cmdr				= aux_cmdr.replace("@@", "").replace("##", "");
+        		//
+        		for (String s : vCmdsInt)
+        		{
+        			String aux_cmdi		= cmdhi.selectCmdBody("0", s);
+
+        			//Treat intern parameters and Replace for database values...
+        			aux_cmdi			= changeParams(cmdhi, aux_cmdi);
+                	
+            		//Call Process to update/create tmp CMD... 
+            		updRecCmdFileTmp(s, aux_cmdi);
+				}
         	}
         	
 // *** TEST ***************************************************** SRV to LOCALHOST...
@@ -197,20 +157,7 @@ public class ECMchecksCmds {
         		//Call execution...
         		System.out.println("Starting Check Execution - " + aux_code + "...");
         		int ret = 0;
-        		
-        		//Check if necessary to send Parameters...
-        		if ( 	(this.check_cd.equals("2")) || 
-        				(this.check_cd.equals("6")) || 
-        				(this.check_cd.equals("7")) )
-        		{
-        			ret	= execChk.callCheckCMD(fileCMD +	" " + this.unix_usr +
-        													" " + this.unix_pwd +
-        													" " + this.unix_hst	+
-        													" " + this.sql_usr 	+
-        													" " + this.sql_pwd 	+
-        													" " + this.sql_hst	);
-        		}
-        		else { ret	= execChk.callCheckCMD(fileCMD); }
+        		ret	= execChk.callCheckCMD(fileCMD);
         		//
         		if (ret == 0)
         		{
@@ -274,11 +221,30 @@ public class ECMchecksCmds {
 	{
 		try
 		{
-			if (args.length > 1)
-			{
-				ECMchecksCmds ecmCmds = new ECMchecksCmds(args[0], args[1]);
-				ecmCmds.callCmdsInterval();
-			}
+			ECMchecksCmds ecmCmdsT = new ECMchecksCmds("2", "mps_test.log");
+			ecmCmdsT.callCmdsInterval();
+			
+			//
+			//ECMchecksCmds ecmCmds1 = new ECMchecksCmds("1", "mps_infra.log");
+			//ecmCmds1.callCmdsInterval();
+			//
+			//ECMchecksCmds ecmCmds2 = new ECMchecksCmds("2", "mps_otass.log");
+			//ecmCmds2.callCmdsInterval();
+			//
+			//ECMchecksCmds ecmCmds3 = new ECMchecksCmds("3", "mps_dpwin.log");
+			//ecmCmds3.callCmdsInterval();
+			//
+			//ECMchecksCmds ecmCmds4 = new ECMchecksCmds("4", "mps_sql.log");
+			//ecmCmds4.callCmdsInterval();
+			//
+			//ECMchecksCmds ecmCmds5 = new ECMchecksCmds("5", "mps_fcir.log");
+			//ecmCmds5.callCmdsInterval();
+			
+			//if (args.length > 1)
+			//{
+			//	ECMchecksCmds ecmCmds = new ECMchecksCmds(args[0], args[1]);
+			//	ecmCmds.callCmdsInterval();
+			//}
 		}
 		catch (IOException e)
 		{

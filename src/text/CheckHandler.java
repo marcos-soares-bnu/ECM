@@ -114,7 +114,12 @@ public class CheckHandler {
                 }
             } else {
                 //logica de quando terá uma configuração de definicao de erro
-                if (item.getItemName().equalsIgnoreCase("DPWIN007")) {
+                if (item.getItemName().equalsIgnoreCase("DPWIN006")) {
+                    Date dateNOW = this.getDateNow(checkInfos);
+                    lDP.DPWIN006(checkInfos, dateNOW);
+                    this.setItemErrors(checkInfos);
+                    //--------------------------------------------------------------------------------
+                } else if (item.getItemName().equalsIgnoreCase("DPWIN007")) {
                     Date dateNOW = this.getDateNow(checkInfos);
                     lDP.DPWIN007(checkInfos, dateNOW);
                     this.setItemErrors(checkInfos);

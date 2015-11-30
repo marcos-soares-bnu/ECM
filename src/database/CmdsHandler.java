@@ -100,6 +100,26 @@ public class CmdsHandler {
 		return ret;
     }
     
+    
+    public String selectCmdBody(String check_cd, String code)
+    {
+    	ResultSet rs;
+        String where = "check_cd = '"+ check_cd + "'";
+        where += " AND code = '" + code + "'";
+        String ret = "";
+        
+        rs = db.doSelect("body", Constantes.DB_ChecksCmds_Table, where);
+        try {
+            if (rs.next()) {
+                ret = rs.getString("body");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+		return ret;
+    }
+    
+    
     public List <List <String> > selectCmds(String check_cd) {
 
     	ResultSet rs;
