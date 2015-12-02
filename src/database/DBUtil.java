@@ -19,7 +19,7 @@ public class DBUtil {
     private Connection conn;
 
     public DBUtil() {
-        this.conn = new ConnectionManager().getConnection();
+        this.conn = getConn();
     }
 
     public DBUtil(Connection conn) {
@@ -27,27 +27,51 @@ public class DBUtil {
     }
 
     public Connection getConn() {
-        if (conn == null) {
-            conn = new ConnectionManager().getConnection();
+        try {
+            if (conn == null || conn.isClosed()) {
+                conn = new ConnectionManager().getConnection();
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
         return conn;
     }
 
     public void execSQL(String sql) {
-        //Testing reasons
-        if (Constantes.SHOW_DB_MESSAGES) {
-            System.out.println(sql);
-        }
-
         Statement stmt = null;
         try {
             stmt = this.getConn().createStatement();
+            if (Constantes.SHOW_DB_MESSAGES) {
+                System.out.println(stmt);
+            }
             stmt.executeUpdate(sql);
             stmt.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
+        } finally {
+            this.closeConn();
         }
+    }
+
+    public ResultSet doSelect(String fields, String table) {
+        String sql = "SELECT " + fields;
+        sql += " FROM " + table;
+        sql += ";";
+
+        try {
+            Statement stmt = getConn().createStatement();
+            if (Constantes.SHOW_DB_MESSAGES) {
+                System.out.println(stmt);
+            }
+
+            return stmt.executeQuery(sql);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e);
+        }
+        return null;
     }
 
     public ResultSet doSelect(String fields, String table, String condition) {
@@ -59,55 +83,78 @@ public class DBUtil {
         }
         sql += ";";
 
-        //Testing reasons
-        if (Constantes.SHOW_DB_MESSAGES) {
-            System.out.println(sql);
-        }
-
         try {
-            Statement stmt = conn.createStatement();
+            Statement stmt = getConn().createStatement();
+            if (Constantes.SHOW_DB_MESSAGES) {
+                System.out.println(stmt);
+            }
 
             return stmt.executeQuery(sql);
 
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, e);
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, null);
         }
         return null;
     }
 
-    public String getAgeCheckLastExec(String code)
-    {
+    public ResultSet doSelect(String fields, String table, String condition, String extra) {
+        String sql = "SELECT " + fields;
+        sql += " FROM " + table;
+
+        if (!condition.isEmpty()) {
+            sql += " WHERE " + condition;
+        }
+        if (!extra.isEmpty()) {
+            sql += " " + extra;
+        }
+        sql += ";";
+
+        try {
+            Statement stmt = getConn().createStatement();
+            if (Constantes.SHOW_DB_MESSAGES) {
+                System.out.println(stmt);
+            }
+
+            return stmt.executeQuery(sql);
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, null);
+        }
+        return null;
+    }
+
+    public String getAgeCheckLastExec(String code) {
         String fields = "(TIME_TO_SEC(TIMEDIFF(NOW(), lastexec)) / 60)";
         String table = Constantes.DB_ChecksCmds_Table;
         String condition = "code = '" + code + "'";
         ResultSet rs = this.doSelect(fields, table, condition);
 
         String strExec = "";
-        try
-        {
-            if (rs.next())
-            {
+        try {
+            if (rs.next()) {
                 String lastexec = rs.getString(1);
-                if (lastexec != null)	{ strExec = lastexec; }
-                else					{ strExec = "999999"; }
+                if (lastexec != null) {
+                    strExec = lastexec;
+                } else {
+                    strExec = "999999";
+                }
             }
-        }
-        catch (SQLException e)
-        {
+        } catch (SQLException e) {
             e.printStackTrace();
             strExec = "999999";
         }
-        if (strExec.equals(""))	{ strExec = "999999"; }        
+        if (strExec.equals("")) {
+            strExec = "999999";
+        }
         return strExec;
     }
-    
 
     public String getLastExecTime() {
         String fields = "MAX(exec_time)";
         String table = Constantes.DB_ChecksOutput_Table;
-        String condition = "";
-        ResultSet rs = this.doSelect(fields, table, condition);
+        ResultSet rs = this.doSelect(fields, table);
 
         String strExec = "";
         try {
@@ -151,17 +198,14 @@ public class DBUtil {
                 System.out.println(pstmt);
             }
             pstmt.executeUpdate();
-
-            //best practices JDBC close...
             pstmt.close();
 
         } catch (SQLException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, e);
+            JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, null);
         }
     }
 
-    //close at the end...
     public void closeConn() {
         try {
             conn.close();

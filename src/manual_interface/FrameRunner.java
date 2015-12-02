@@ -2,7 +2,7 @@ package manual_interface;
 
 import javax.swing.UIManager;
 
-public class Runner {
+public class FrameRunner {
 
     public static void main(String[] args) {
         try {

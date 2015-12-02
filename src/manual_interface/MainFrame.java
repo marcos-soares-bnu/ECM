@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -18,36 +19,35 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.border.TitledBorder;
 
-import database.DBCheck;
-import database.DBCheckItem;
 import database.DBUtil;
 import main.ECMchecksCmds;
-import object.OBJCheckItem;
 import text.FileReaderUtil;
 import util.Constantes;
-import javax.swing.JScrollPane;
-import javax.swing.JTextArea;
 
 public class MainFrame extends JFrame {
 
     private DBUtil dbUtil;
 
-    private JPanel pnRun;
-    private JPanel pnLog;
-    private JPanel pnDBOutput;
-    private JPanel pnOutputFile;
-    private JTextField tfOut;
-
-    private JButton btnUpdate;
     private JTextArea tfaLog;
     private JButton btnUpdateActions;
 
+    private JPanel pnRun;
+    private JPanel pnLog;
+
+    private JPanel pnDBOutput;
+    private JPanel pnOutputFile;
+    private JButton btnUpdate;
+    private JTextField tfOut;
+
     public MainFrame() {
-        setSize(new Dimension(720, 700));
+        setMaximumSize(new Dimension(1000, 700));
+        setSize(new Dimension(1000, 700));
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         dbUtil = new DBUtil();
         setTitle("Script Testing Interface");
@@ -56,10 +56,8 @@ public class MainFrame extends JFrame {
         getContentPane().add(tabbedPane, BorderLayout.CENTER);
 
         pnRun = new JPanel();
-        pnRun.setAlignmentY(Component.TOP_ALIGNMENT);
         tabbedPane.addTab("Scripts", null, pnRun, null);
-        FlowLayout flowLayout = (FlowLayout) pnRun.getLayout();
-        flowLayout.setAlignment(FlowLayout.CENTER);
+        pnRun.setLayout(new BoxLayout(pnRun, BoxLayout.X_AXIS));
 
         pnLog = new JPanel();
         tabbedPane.addTab("LOG", null, pnLog, null);
@@ -83,6 +81,7 @@ public class MainFrame extends JFrame {
 
         pnDBOutput = new JPanel();
         tabbedPane.addTab("DBOutput", null, pnDBOutput, null);
+        pnDBOutput.setLayout(new BoxLayout(pnDBOutput, BoxLayout.X_AXIS));
 
         pnOutputFile = new JPanel();
         getContentPane().add(pnOutputFile, BorderLayout.NORTH);
@@ -121,12 +120,12 @@ public class MainFrame extends JFrame {
 
     private void loadDBScripts(boolean mainScreen) {
         //Busca os checks do banco de dados e insere no mapa
-        Map<Integer, DBCheck> checks = new TreeMap<Integer, DBCheck>();
-        ResultSet rs = dbUtil.doSelect("*", Constantes.DB_Checks_Table, "");
+        Map<Integer, InterfaceCheck> checks = new TreeMap<Integer, InterfaceCheck>();
+        ResultSet rs = dbUtil.doSelect("*", Constantes.DB_Checks_Table);
         try {
             while (rs.next()) {
                 int id = rs.getInt(1);
-                DBCheck c = new DBCheck(id);
+                InterfaceCheck c = new InterfaceCheck(id);
                 checks.put(id, c);
             }
         } catch (SQLException e) {
@@ -136,20 +135,27 @@ public class MainFrame extends JFrame {
         //Se foi buscado algo do Banco de dados, continua
         if (!checks.isEmpty()) {
             //Insere no layout
-            for (DBCheck c : checks.values()) {
+            for (InterfaceCheck c : checks.values()) {
                 JPanel pn = new JPanel();
                 pn.setLayout(new BoxLayout(pn, BoxLayout.Y_AXIS));
+                pn.setAlignmentY(Component.TOP_ALIGNMENT);
                 String title = c.getId() + " - " + c.getCheck_name();
                 pn.setBorder(new TitledBorder(null, title, TitledBorder.LEADING, TitledBorder.TOP, null, null));
+                pn.setMinimumSize(new Dimension(300, 30));
+                pn.setMaximumSize(new Dimension(300, 1000));
 
                 //Get ITENS from Check
-                DBCheckItem i = new DBCheckItem(c.getId());
-                for (OBJCheckItem objItem : i.getItens().values()) {
-                    String btnName = objItem.getItemName();
+                List<InterfaceCheckItem> cItens = c.getCheckItens();
+                for (int i = 0; i < cItens.size(); i++) {
+                    String btnName = cItens.get(i).getItem_name();
                     JButton btn = new JButton(btnName);
-                    addButtonAction(btn, objItem, mainScreen);
+                    btn.setAlignmentX(Component.CENTER_ALIGNMENT);
+                    btn.setMinimumSize(new Dimension(120, 20));
+                    btn.setMaximumSize(new Dimension(180, 30));
+                    addButtonAction(btn, cItens.get(i), mainScreen);
                     pn.add(btn);
                 }
+
                 if (mainScreen) {
                     pnRun.add(pn);
                 } else {
@@ -159,10 +165,10 @@ public class MainFrame extends JFrame {
         }
     }
 
-    private void addButtonAction(JButton btn, OBJCheckItem objItem, boolean mainScreen) {
-        final String code = objItem.getItemName();
+    private void addButtonAction(JButton btn, InterfaceCheckItem checkItem, boolean mainScreen) {
+        final String code = checkItem.getItem_name();
         if (mainScreen) {
-            final String check_cd = String.valueOf(objItem.getCheck_id());
+            final String check_cd = String.valueOf(checkItem.getCheck_id());
             final String path_out = tfOut.getText();
 
             btn.addActionListener(new ActionListener() {
@@ -171,13 +177,15 @@ public class MainFrame extends JFrame {
                     ECMchecksCmds cmd = new ECMchecksCmds(check_cd, code, path_out);
                     try {
                         cmd.callCmdsInterval();
+                        JOptionPane.showMessageDialog(null, "Check executed!");
                     } catch (IOException e) {
                         e.printStackTrace();
+                        JOptionPane.showMessageDialog(null, e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE, null);
                     }
                 }
             });
         } else {
-            ResultSet rs = dbUtil.doSelect("lastexec, lastLog", "linde_mps_cmds", "code='" + code + "'");
+            ResultSet rs = dbUtil.doSelect("lastexec, lastLog", Constantes.DB_ChecksCmds_Table, "code='" + code + "'");
             try {
                 if (rs.next()) {
                     final String exec = String.valueOf(rs.getTimestamp("lastexec"));
