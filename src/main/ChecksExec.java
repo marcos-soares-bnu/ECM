@@ -153,7 +153,10 @@ public class ChecksExec {
                     }else if (cItem.getItemName().equals("OTASS002")) {
                         this.checkOtass002IsNewError(checkID, checkItemID, err, exec_time, status);
                     } else if (cItem.getItemName().equals("OTASS012")) {
-                        this.checkOtass012IsNewError(checkID, checkItemID, err, exec_time, status);
+                        String[] errors = err.getOutput_error().split("\n");
+                        for (int i = 0; i < errors.length; i++) {
+                            this.checkOtass012IsNewError(checkID, checkItemID, errors[i], exec_time, status);
+                        }
                     } else if (cItem.getItemName().equals("OTASS013")) {
                         this.checkOtass013IsNewError(checkID, checkItemID, err, exec_time, status);
                     } else if (cItem.getItemName().equals("DPWIN001") || cItem.getItemName().equals("DPWIN002")) {
@@ -283,26 +286,31 @@ public class ChecksExec {
                 }
             }
         }
+        
     }
     
-    private void checkOtass012IsNewError(int checkID, int checkItemID, OBJCheckOutput err, Date exec_time, String status) {
+    private void checkOtass012IsNewError(int checkID, int checkItemID, String err, Date exec_time, String status) {
+        boolean isOld = false;
         for (DBCheckOutput out : dbLastErrors.values()) {
             if (out.getCheck_id() == checkID && out.getCheck_item_id() == checkItemID) {
                 //Utiliza as informações de indice abaixo para extrair somente nome do pool reportado
-                int indicePrimeiroParentese = out.getOutput_error().indexOf("(");
-                int indiceSegundoParentese = out.getOutput_error().indexOf(")");
+                int indicePrimeiroParentese = err.indexOf("(");
+                int indiceSegundoParentese = err.indexOf(")");
                 //Nome do pool apresentando erro atualmente
-                String nomeDoPool = err.getOutput_error().substring(indicePrimeiroParentese, indiceSegundoParentese);
-                if (out.getOutput_error().contains(nomeDoPool)) {
-                    //Se o erro atual se refere ao mesmo erro da verif. anterior, insere como erro não-novo
-                    DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 0); //isNew=0);
-                    dbOutput.DB_store();
-                } else {
-                    //Senão insere como erro novo
-                    DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 1); //isNew=1);
-                    dbOutput.DB_store();
-                }
+                String nomeDoPool = err.substring(indicePrimeiroParentese, indiceSegundoParentese);
+                //Ao verificar que o erro atual já existe no DB, isOld = true.
+                if (out.getOutput_error().contains(nomeDoPool))
+                    isOld = true;
             }
+        }
+        //Se o erro atual se refere ao mesmo erro da verif. anterior, insere como erro não-novo
+        if (isOld) {
+            DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err, exec_time, 0); //isNew=0);
+            dbOutput.DB_store();
+        //Senão insere como erro novo    
+        } else {
+            DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err, exec_time, 1); //isNew=1);
+            dbOutput.DB_store();
         }
     }
 
