@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import util.Constantes;
+
 public class ECMchecksCmds {
 
 	public String path_out;
@@ -126,18 +128,21 @@ public class ECMchecksCmds {
 				}
         	}
         	
+        	if (!Constantes.LINDE_ENVIRONMENT)
+        	{
 // *** TEST ***************************************************** SRV to LOCALHOST...
-        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP289", "\\LOCALHOST");
-        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP290", "\\LOCALHOST");
-        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00SAP019", "\\LOCALHOST");
-        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00SAP041", "\\LOCALHOST");
-        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP571", "\\LOCALHOST");
-        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP577", "\\LOCALHOST");
-        	aux_cmdr			= aux_cmdr.replace("\\mlgmuc00app667", "\\LOCALHOST");
-        	aux_cmdr			= aux_cmdr.replace("\\mlgmuc00app664", "\\LOCALHOST");
-        	aux_cmdr			= aux_cmdr.replace("\\mlgmuc00app705", "\\LOCALHOST");
-        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP706", "\\LOCALHOST");
+	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP289", "\\LOCALHOST");
+	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP290", "\\LOCALHOST");
+	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00SAP019", "\\LOCALHOST");
+	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00SAP041", "\\LOCALHOST");
+	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP571", "\\LOCALHOST");
+	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP577", "\\LOCALHOST");
+	        	aux_cmdr			= aux_cmdr.replace("\\mlgmuc00app667", "\\LOCALHOST");
+	        	aux_cmdr			= aux_cmdr.replace("\\mlgmuc00app664", "\\LOCALHOST");
+	        	aux_cmdr			= aux_cmdr.replace("\\mlgmuc00app705", "\\LOCALHOST");
+	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP706", "\\LOCALHOST");
 // *** TEST ***************************************************** SRV to LOCALHOST...
+        	}
         	
         	//Calc age of lastexec in minutes...
         	String aux_agelast 	= cmdhi.getAgeCheckLastExec(aux_code);
@@ -221,7 +226,7 @@ public class ECMchecksCmds {
 	{
 		try
 		{
-			ECMchecksCmds ecmCmdsT = new ECMchecksCmds("2", "mps_test.log");
+			ECMchecksCmds ecmCmdsT = new ECMchecksCmds("7", "mps_test.log");
 			ecmCmdsT.callCmdsInterval();
 			
 			//
