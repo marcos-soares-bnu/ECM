@@ -226,7 +226,7 @@ public class ECMchecksCmds {
 	{
 		try
 		{
-			ECMchecksCmds ecmCmdsT = new ECMchecksCmds("7", "mps_test.log");
+			ECMchecksCmds ecmCmdsT = new ECMchecksCmds("7", "mps_icc.log");
 			ecmCmdsT.callCmdsInterval();
 			
 			//

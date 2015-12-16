@@ -158,12 +158,12 @@ public class DBCheckOutput {
         //Check if exists last errors 
         if (!strDBLastExec.isEmpty()) {
             //Fields for all errors, except OTASS013 errors.
-            String fields_All = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_CI as 'Ticket CI', lcitens.ticket_prio as 'Ticket Prio', lcitens.ticket_brief as 'Ticket Brief', outp.output_error as 'Ticket Description'";
+            String fields_All = "outp.id, citens.item_name as 'Check Item', lcitens.ticket_ci as 'Ticket CI', lcitens.item_prio as 'Ticket Prio', lcitens.ticket_brief as 'Ticket Brief', outp.output_error as 'Ticket Description'";
             String tables0_All = "check_scripts_output outp ";
             String tables1_All = "INNER JOIN check_scripts_itens citens ON ";
             String tables2_All = "citens.id = outp.check_item_id ";
-            String tables3_All = "INNER JOIN linde_check_itens lcitens ON ";
-            String tables4_All = "lcitens.code = citens.item_name ";
+            String tables3_All = "INNER JOIN check_scripts_tickets_config lcitens ON ";
+            String tables4_All = "lcitens.check_item_id = citens.id ";
             String condition_All = "outp.status='NOK' AND outp.is_new='1' AND outp.mail_sent='0' AND outp.check_item_id <> 35 AND outp.exec_time = '" + strDBLastExec + "'";
             //ResultSet for all errors, except OTASS013 errors.
             ResultSet rsAll = db.doSelect(fields_All, (tables0_All + tables1_All + tables2_All + tables3_All + tables4_All), condition_All);

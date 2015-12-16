@@ -80,7 +80,7 @@ public class DateUtil {
         }
         return false;
     }
-
+    
     public boolean moreThanXhours(Date nowDate, Date fileDate, int XHours) {
         long horas = (nowDate.getTime() - fileDate.getTime()) / 3600000;
         if (horas >= XHours) {
@@ -172,13 +172,13 @@ public class DateUtil {
         Date dt = (Date) this.getFileDateFromString(strDtFull);
         return dt;
     }
-
+    
     public Date getFileDateDPWIN006(String fileInfo) {
         String[] str = fileInfo.split("    ");
         Date dt = (Date) this.getFileDateFromString(str[0]);
         return dt;
     }
-
+    
     public Date getFileDateDPWIN007(String fileInfo) {
         String[] str = fileInfo.split("    ");
         Date dt = (Date) this.getFileDateFromString(str[0]);
