@@ -60,6 +60,12 @@ public class MajorMain {
             pixcore.execCheck();
             pixcore.storeINDB();
         }
+        
+        ChecksExec icc = new ChecksExec(Constantes.DB_ICC_ID, executionTime);
+        if (icc.getObjCheck().getItens().size() > 0) {
+        	icc.execCheck();
+        	icc.storeINDB();
+        }
 
         //System.out.println("==================================================================================================================================");
         System.out.println("Executing the OTASS013 Verification...");

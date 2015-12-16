@@ -65,14 +65,36 @@ public class ChecksExec {
 
     public void execCheck() {
         if (Constantes.LINDE_ENVIRONMENT) {
-            if (objCheck.getId() == 2) {
-                //If OTASS, call special implementation
-                this.callCMD(new DecryptOTASS().getUserandPass());
-            } else {
-                //Else, call standard implementation
-                this.callCMD();
-            }
+        	
+        	//MPS - Add var para testes dos Cmds com intervalos...
+        	if (Constantes.LINDE_CMDS_INTERVAL){
+        		
+				ECMchecksCmds ecmCmds = new ECMchecksCmds(String.valueOf(objCheck.getId()), dbCheckConfig.getPath_cmd());
+				try { ecmCmds.callCmdsInterval(); }
+				catch (IOException e) { e.printStackTrace(); }
+        	}
+        	else {
+	            if (objCheck.getId() == 2) {
+	                //If OTASS, call special implementation
+	                this.callCMD(new DecryptOTASS().getUserandPass());
+	            } else {
+	                //Else, call standard implementation
+	                this.callCMD();
+	            }
+        	}
+            
         } else {
+        	
+//*******************************************************************************************
+        	//MPS - Add var para testes dos Cmds com intervalos...
+        	if (Constantes.LINDE_CMDS_INTERVAL){
+        		
+				ECMchecksCmds ecmCmds = new ECMchecksCmds(String.valueOf(objCheck.getId()), dbCheckConfig.getPath_cmd());
+				try { ecmCmds.callCmdsInterval(); }
+				catch (IOException e) { e.printStackTrace(); }
+        	}
+        	else {
+        	
             //Tratamento para cada log:
             switch (objCheck.getId()) {
                 case Constantes.DB_INFRA_ID:
@@ -93,12 +115,30 @@ public class ChecksExec {
                 case Constantes.DB_PIXCORE_ID:
                     dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_pixcore_OK.log");
                     break;
+                case Constantes.DB_ICC_ID:
+                    dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_icc.log");
+                    break;
 
                 default:
                     break;
-            }
+                    
+            	}
+        	}
+//*******************************************************************************************
         }
         this.checkCMDOutput();
+    }
+
+    public int callCheckCMD(String cmd) {
+        try {
+            Process p = Runtime.getRuntime().exec("cmd /c start /min /wait " + cmd);
+            p.waitFor();
+            return p.exitValue();
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+            return 999;
+            //JOptionPane.showMessageDialog(null, e);
+        }
     }
 
     private void callCMD() {
