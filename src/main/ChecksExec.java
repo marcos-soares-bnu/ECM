@@ -186,7 +186,8 @@ public class ChecksExec {
                     //******************************************************************************
                     //Test Hard-code items set to more than 1 ticket/error line
                     //******************************************************************************
-                    if (cItem.getItemName().equals("MON018") || cItem.getItemName().equals("MON019") || cItem.getItemName().equals("MON020")) {
+                    if (cItem.getItemName().equals("MON018") || cItem.getItemName().equals("MON019") || cItem.getItemName().equals("MON020")
+                                                            || cItem.getItemName().equals("MON019_2") || cItem.getItemName().equals("MON020_2")) {
 
                         //record list of New Errors/Exists on DB...
                         this.recordArrCheckIsNewError(checkID, checkItemID, err, exec_time, status);
@@ -199,7 +200,8 @@ public class ChecksExec {
                         }
                     } else if (cItem.getItemName().equals("OTASS013")) {
                         this.checkOtass013IsNewError(checkID, checkItemID, err, exec_time, status);
-                    } else if (cItem.getItemName().equals("DPWIN001") || cItem.getItemName().equals("DPWIN002")) {
+                    } else if (cItem.getItemName().equals("DPWIN001") || cItem.getItemName().equals("DPWIN002")
+                               || cItem.getItemName().equals("DPWIN001_2") || cItem.getItemName().equals("DPWIN002_2") ) {
                         //record list of New Errors/Exists on DB...
                         this.recordArrCheckIsNewErrorTasks(checkID, checkItemID, err, exec_time, status);
                     } //else if (cItem.getItemName().equals("FCIR004")) {
