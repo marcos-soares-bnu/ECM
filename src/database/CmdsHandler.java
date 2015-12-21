@@ -69,35 +69,22 @@ public class CmdsHandler {
         db.doINSERT(pstmt);
     }
     
-    public void updateLastID(String lastID) {
+    public void updateLastID(String lastid, String code) {
 
-    	String table = "linde_otass";
-        String field = "last_id";
+    	String table = Constantes.DB_ChecksCmds_Table;
+        String field = "body";
 
         PreparedStatement pstmt = null;
         try {
-            pstmt = db.getConn().prepareStatement("UPDATE " + table + " SET " + field + " = ? WHERE is_enabled = 1;");
+            pstmt = db.getConn().prepareStatement("UPDATE " + table + " SET " + field + " = ? WHERE code = ?;");
             //
-            pstmt.setString(1, lastID);            
+            pstmt.setString(1, lastid);            
+            pstmt.setString(2, code);            
             
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(null, e);
         }
         db.doINSERT(pstmt);
-    }
-    
-    public String selectLastID() {
-        ResultSet rs;
-        String ret = "";
-        rs = db.doSelect("last_id", "linde_otass", "is_enabled = 1");
-        try {
-            if (rs.next()) {
-                ret = rs.getString("last_id");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-		return ret;
     }
     
     
