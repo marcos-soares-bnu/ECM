@@ -170,7 +170,11 @@ public class ECMchecksCmds {
         	    	String fileContent	= "";
         			fileContent			= readAllFile(aux_path + "." + this.check_cd);
 
-        			cmdhi.setLastLogCheck(fileContent, aux_code);	//update lastlog...
+        			if (fileContent.length() >= 65535)
+        				cmdhi.setLastLogCheck(fileContent, aux_code);	//update lastlog...
+        			else
+        				cmdhi.setLastLogCheck(fileContent.substring(0, 65535), aux_code);	//update lastlog...
+
         			cmdhi.setLastExecCheck(aux_code); 				//update lastexec...
     				
         			//Write and Join checks into path_out... 
@@ -226,24 +230,28 @@ public class ECMchecksCmds {
 	{
 		try
 		{
-			ECMchecksCmds ecmCmdsT = new ECMchecksCmds("7", "mps_icc.log");
-			ecmCmdsT.callCmdsInterval();
+			//
+			ECMchecksCmds ecmCmds1 = new ECMchecksCmds("1", "mps_infra.log");
+			ecmCmds1.callCmdsInterval();
+			//
+			ECMchecksCmds ecmCmds2 = new ECMchecksCmds("2", "mps_otass.log");
+			ecmCmds2.callCmdsInterval();
+			//
+			ECMchecksCmds ecmCmds3 = new ECMchecksCmds("3", "mps_dpwin.log");
+			ecmCmds3.callCmdsInterval();
+			//
+			ECMchecksCmds ecmCmds4 = new ECMchecksCmds("4", "mps_sql.log");
+			ecmCmds4.callCmdsInterval();
+			//
+			ECMchecksCmds ecmCmds5 = new ECMchecksCmds("5", "mps_fcir.log");
+			ecmCmds5.callCmdsInterval();
+
+			ECMchecksCmds ecmCmds6 = new ECMchecksCmds("6", "mps_pix.log");
+			ecmCmds6.callCmdsInterval();
+
+			ECMchecksCmds ecmCmds7 = new ECMchecksCmds("7", "mps_icc.log");
+			ecmCmds7.callCmdsInterval();
 			
-			//
-			//ECMchecksCmds ecmCmds1 = new ECMchecksCmds("1", "mps_infra.log");
-			//ecmCmds1.callCmdsInterval();
-			//
-			//ECMchecksCmds ecmCmds2 = new ECMchecksCmds("2", "mps_otass.log");
-			//ecmCmds2.callCmdsInterval();
-			//
-			//ECMchecksCmds ecmCmds3 = new ECMchecksCmds("3", "mps_dpwin.log");
-			//ecmCmds3.callCmdsInterval();
-			//
-			//ECMchecksCmds ecmCmds4 = new ECMchecksCmds("4", "mps_sql.log");
-			//ecmCmds4.callCmdsInterval();
-			//
-			//ECMchecksCmds ecmCmds5 = new ECMchecksCmds("5", "mps_fcir.log");
-			//ecmCmds5.callCmdsInterval();
 			
 			//if (args.length > 1)
 			//{
