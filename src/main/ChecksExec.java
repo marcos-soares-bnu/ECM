@@ -69,7 +69,7 @@ public class ChecksExec {
         	//MPS - Add var para testes dos Cmds com intervalos...
         	if (Constantes.LINDE_CMDS_INTERVAL){
         		
-				ECMchecksCmds ecmCmds = new ECMchecksCmds(String.valueOf(objCheck.getId()), dbCheckConfig.getPath_cmd());
+				ECMchecksCmds ecmCmds = new ECMchecksCmds(String.valueOf(objCheck.getId()), dbCheckConfig.getPath_output());
 				try { ecmCmds.callCmdsInterval(); }
 				catch (IOException e) { e.printStackTrace(); }
         	}
