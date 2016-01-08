@@ -2,15 +2,28 @@ package main;
 
 import database.CmdsHandler;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Scanner;
+import java.lang.ProcessBuilder;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
 
-import util.Constantes;
+import output.SyncPipe;
+
+
 
 public class ECMchecksCmds {
 
@@ -93,60 +106,19 @@ public class ECMchecksCmds {
 	
 	public void callCmdsInterval() throws IOException
 	{
+		CmdsHandler cmdhi		= new CmdsHandler();
         Date execTime			= new Date();
 		String aux_path			= this.path_out;
 		FileWriter writer 		= new FileWriter(aux_path, false);
 		
         for (List<String> list : this.lstCmds)
         {
-    		CmdsHandler cmdhi	= new CmdsHandler();
         	String aux_code 	= list.get(1);
         	String aux_cmde 	= list.get(2);
         	String aux_inte 	= list.get(3);
-        	
-        	//Change @LOGFILE to path_out...   
-        	String aux_cmdr		= aux_cmde.replace("@LOGFILE", (aux_path + "." + this.check_cd));
 
-        	//Treat intern parameters and Replace for database values...
-        	aux_cmdr			= changeParams(cmdhi, aux_cmdr);
-        	
-        	//Treat the intern Unix call sql/shell commands to save locally...
-        	if (aux_cmdr.indexOf("@@") > 0)
-        	{
-            	List<String> vCmdsInt	= getListInternCmds(aux_cmdr, "@@|##", 20); 
-        		aux_cmdr				= aux_cmdr.replace("@@", "").replace("##", "");
-        		//
-        		for (String s : vCmdsInt)
-        		{
-        			String aux_cmdi		= cmdhi.selectCmdBody("0", s);
-
-        			//Treat intern parameters and Replace for database values...
-        			aux_cmdi			= changeParams(cmdhi, aux_cmdi);
-                	
-            		//Call Process to update/create tmp CMD... 
-            		updRecCmdFileTmp(s, aux_cmdi);
-				}
-        	}
-        	
-        	if (!Constantes.LINDE_ENVIRONMENT)
-        	{
-// *** TEST ***************************************************** SRV to LOCALHOST...
-	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP289", "\\LOCALHOST");
-	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP290", "\\LOCALHOST");
-	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00SAP019", "\\LOCALHOST");
-	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00SAP041", "\\LOCALHOST");
-	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP571", "\\LOCALHOST");
-	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP577", "\\LOCALHOST");
-	        	aux_cmdr			= aux_cmdr.replace("\\mlgmuc00app667", "\\LOCALHOST");
-	        	aux_cmdr			= aux_cmdr.replace("\\mlgmuc00app664", "\\LOCALHOST");
-	        	aux_cmdr			= aux_cmdr.replace("\\mlgmuc00app705", "\\LOCALHOST");
-	        	aux_cmdr			= aux_cmdr.replace("\\MLGMUC00APP706", "\\LOCALHOST");
-// *** TEST ***************************************************** SRV to LOCALHOST...
-        	}
-        	
         	//Calc age of lastexec in minutes...
         	String aux_agelast 	= cmdhi.getAgeCheckLastExec(aux_code);
-            ChecksExec execChk	= new ChecksExec(Integer.parseInt(this.getCheck_cd()), execTime);
         	Float ageLastExec 	= Float.parseFloat(aux_agelast);
         	Float intervCheck 	= Float.parseFloat(aux_inte);
         	
@@ -156,34 +128,71 @@ public class ECMchecksCmds {
         	}
         	else
         	{
-        		//Call Process to update/create tmp CMD... 
-        		String fileCMD = updRecCmdFileTmp("tmp." + this.check_cd + ".cmd", aux_cmdr);
+	        	//Change @LOGFILE to path_out...   
+	        	String aux_cmdr				= aux_cmde.replace("@LOGFILE", (aux_path + "." + this.check_cd));
+	
+	        	//Treat intern parameters and Replace for database values...
+	        	aux_cmdr					= changeParams(cmdhi, aux_cmdr);
+	        	
+	        	//Treat the intern Unix call sql/shell commands to save locally...
+	        	if (aux_cmdr.indexOf("@@") > 0)
+	        	{
+	            	List<String> vCmdsInt	= getListInternCmds(aux_cmdr, "@@|##", 20); 
+	        		aux_cmdr				= aux_cmdr.replace("@@", "").replace("##", "");
+	        		//
+	        		for (String s : vCmdsInt)
+	        		{
+	        			String aux_cmdi		= cmdhi.selectCmdBody("0", s);
+	
+	        			//Treat intern parameters and Replace for database values...
+	        			aux_cmdi			= changeParams(cmdhi, aux_cmdi);
+	                	
+	            		//Call Process to update/create tmp CMD... 
+	            		updRecCmdFileTmp(s, aux_cmdi);
+					}
+	        	}
+	        	
+	    		//Call Process to update/create tmp CMD... 
+	    		String fileCMD 				= updRecCmdFileTmp("tmp." + this.check_cd + ".cmd", aux_cmdr);
 				
-        		//Call execution...
-        		System.out.println("Starting Check Execution - " + aux_code + "...");
-        		int ret = 0;
-        		ret	= execChk.callCheckCMD(fileCMD);
-        		//
-        		if (ret == 0)
-        		{
-        			//Get fileContent of aux_path + "." + this.check_cd...
-        	    	String fileContent	= "";
-        			fileContent			= readAllFile(aux_path + "." + this.check_cd);
-
-        			if (fileContent.length() >= 65535)
-        				cmdhi.setLastLogCheck(fileContent.substring(0, 65535), aux_code);	//update lastlog...
-        			else
-        				cmdhi.setLastLogCheck(fileContent, aux_code);	//update lastlog...
-
-        			cmdhi.setLastExecCheck(aux_code); 				//update lastexec...
-    				
-        			//Write and Join checks into path_out... 
-        			writer.write(fileContent);
-        		}
+	    		//Call execution...
+	    		System.out.println("Starting Check Execution - " + aux_code + "...");
+	    		String ret 					= "0";
+	            //ChecksExec execChk		= new ChecksExec(Integer.parseInt(this.getCheck_cd()), execTime);
+	    		//ret	= execChk.callCheckCMD(fileCMD);
+	    		try
+	    		{
+	    			List<String> listDB = Arrays.asList(aux_cmdr.split("\r\n")); 
+					ret = execProcess(listDB);
+				}
+	    		catch (InterruptedException e)
+	    		{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+					ret = e.getMessage();
+				}
+	    		System.out.println("End Check Execution - " + aux_code + " - " + ret);
+	    		//
+	    		if (ret.equals("0"))
+	    		{
+	    			//Get fileContent of aux_path + "." + this.check_cd...
+	    	    	String fileContent		= "";
+	    			fileContent				= readAllFile(aux_path + "." + this.check_cd);
+	
+	    			if (fileContent.length() >= 65535)
+	    				cmdhi.setLastLogCheck(fileContent.substring(0, 65535), aux_code);	//upd. lastlog...
+	    			else
+	    				cmdhi.setLastLogCheck(fileContent, aux_code);						//upd. lastlog...
+	
+	    			cmdhi.setLastExecCheck(aux_code); 										//upd. lastexec...
+					
+	    			//Write and Join checks into path_out... 
+	    			writer.write(fileContent);
+	    		}
         	}
-        	//Close conn...
-        	cmdhi.dbClose();
 		}
+    	//Close conn...
+    	cmdhi.dbClose();
         writer.close();
 	}
 	
@@ -226,20 +235,51 @@ public class ECMchecksCmds {
 	}
 	
 	
-	public static void main(String[] args)
+	public static String execProcess(List<String> list) throws IOException, InterruptedException
+	{
+		String[] command = { "cmd", };
+		Process p = Runtime.getRuntime().exec(command);
+		new Thread(new SyncPipe(p.getErrorStream(), System.err)).start();
+		new Thread(new SyncPipe(p.getInputStream(), System.out)).start();
+		PrintWriter stdin = new PrintWriter(p.getOutputStream());
+
+		// write any other commands you want here
+		for (String s : list)
+		{ 
+			stdin.println(s); 
+		} 
+		    
+	    stdin.close();
+	    int returnCode = p.waitFor();
+	    System.out.println("Return code = " + returnCode);
+	    //
+		return String.valueOf(returnCode);
+	}
+	
+	
+	public static void main(String[] args) throws InterruptedException
 	{
 		try
 		{
-			//
-			ECMchecksCmds ecmCmds1 = new ECMchecksCmds("1", "mps_infra.log");
+			//***TESTE***
+			//execProcess("tmp.4.cmd");
+			//execProcess("tmp.3.cmd");
+			//***********
+
+			ECMchecksCmds ecmCmds1 = new ECMchecksCmds("11", "mptest_infra.log");
 			ecmCmds1.callCmdsInterval();
-			//
-			ECMchecksCmds ecmCmds2 = new ECMchecksCmds("2", "mps_otass.log");
-			ecmCmds2.callCmdsInterval();
-			//
+			
+			
+			// 
+			//ECMchecksCmds ecmCmds1 = new ECMchecksCmds("1", "mps_infra.log");
+			//ecmCmds1.callCmdsInterval();
+			// ok
+			//ECMchecksCmds ecmCmds2 = new ECMchecksCmds("2", "mps_otass.log");
+			//ecmCmds2.callCmdsInterval();
+			// ok
 			ECMchecksCmds ecmCmds3 = new ECMchecksCmds("3", "mps_dpwin.log");
 			ecmCmds3.callCmdsInterval();
-			//
+			// 
 			ECMchecksCmds ecmCmds4 = new ECMchecksCmds("4", "mps_sql.log");
 			ecmCmds4.callCmdsInterval();
 			//
