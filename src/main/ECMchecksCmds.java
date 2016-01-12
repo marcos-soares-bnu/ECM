@@ -266,9 +266,15 @@ public class ECMchecksCmds {
 			//execProcess("tmp.3.cmd");
 			//***********
 
+			//
+			ECMchecksCmds ecmCmds22 = new ECMchecksCmds("22", "mptest_infra.log");
+			ecmCmds22.callCmdsInterval();
+			
+			
 			ECMchecksCmds ecmCmds1 = new ECMchecksCmds("11", "mptest_infra.log");
 			ecmCmds1.callCmdsInterval();
-			
+			//
+			//refactoring cmds no DB... 
 			
 			// 
 			//ECMchecksCmds ecmCmds1 = new ECMchecksCmds("1", "mps_infra.log");
@@ -277,20 +283,20 @@ public class ECMchecksCmds {
 			//ECMchecksCmds ecmCmds2 = new ECMchecksCmds("2", "mps_otass.log");
 			//ecmCmds2.callCmdsInterval();
 			// ok
-			ECMchecksCmds ecmCmds3 = new ECMchecksCmds("3", "mps_dpwin.log");
-			ecmCmds3.callCmdsInterval();
-			// 
-			ECMchecksCmds ecmCmds4 = new ECMchecksCmds("4", "mps_sql.log");
-			ecmCmds4.callCmdsInterval();
-			//
-			ECMchecksCmds ecmCmds5 = new ECMchecksCmds("5", "mps_fcir.log");
-			ecmCmds5.callCmdsInterval();
-
-			ECMchecksCmds ecmCmds6 = new ECMchecksCmds("6", "mps_pix.log");
-			ecmCmds6.callCmdsInterval();
-
-			ECMchecksCmds ecmCmds7 = new ECMchecksCmds("7", "mps_icc.log");
-			ecmCmds7.callCmdsInterval();
+//			ECMchecksCmds ecmCmds3 = new ECMchecksCmds("3", "mps_dpwin.log");
+//			ecmCmds3.callCmdsInterval();
+//			// 
+//			ECMchecksCmds ecmCmds4 = new ECMchecksCmds("4", "mps_sql.log");
+//			ecmCmds4.callCmdsInterval();
+//			//
+//			ECMchecksCmds ecmCmds5 = new ECMchecksCmds("5", "mps_fcir.log");
+//			ecmCmds5.callCmdsInterval();
+//
+//			ECMchecksCmds ecmCmds6 = new ECMchecksCmds("6", "mps_pix.log");
+//			ecmCmds6.callCmdsInterval();
+//
+//			ECMchecksCmds ecmCmds7 = new ECMchecksCmds("7", "mps_icc.log");
+//			ecmCmds7.callCmdsInterval();
 			
 			
 			//if (args.length > 1)
