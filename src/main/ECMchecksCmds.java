@@ -2,25 +2,14 @@ package main;
 
 import database.CmdsHandler;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
-import java.lang.ProcessBuilder;
-import java.nio.charset.Charset;
-import java.nio.file.Files;
-
 import output.SyncPipe;
 
 
@@ -107,7 +96,7 @@ public class ECMchecksCmds {
 	public void callCmdsInterval() throws IOException
 	{
 		CmdsHandler cmdhi		= new CmdsHandler();
-        Date execTime			= new Date();
+//        Date execTime			= new Date();
 		String aux_path			= this.path_out;
 		FileWriter writer 		= new FileWriter(aux_path, false);
 		
@@ -147,13 +136,16 @@ public class ECMchecksCmds {
 	        			//Treat intern parameters and Replace for database values...
 	        			aux_cmdi			= changeParams(cmdhi, aux_cmdi);
 	                	
+	    	        	//Change @LOGFILE to path_out... - Jan/2016   
+	    	        	aux_cmdi			= aux_cmdi.replace("@LOGFILE", (aux_path + "." + this.check_cd));
+	        			
 	            		//Call Process to update/create tmp CMD... 
 	            		updRecCmdFileTmp(s, aux_cmdi);
 					}
 	        	}
 	        	
 	    		//Call Process to update/create tmp CMD... 
-	    		String fileCMD 				= updRecCmdFileTmp("tmp." + this.check_cd + ".cmd", aux_cmdr);
+	    		//String fileCMD 				= updRecCmdFileTmp("tmp." + this.check_cd + ".cmd", aux_cmdr);
 				
 	    		//Call execution...
 	    		System.out.println("Starting Check Execution - " + aux_code + "...");
@@ -162,12 +154,11 @@ public class ECMchecksCmds {
 	    		//ret	= execChk.callCheckCMD(fileCMD);
 	    		try
 	    		{
-	    			List<String> listDB = Arrays.asList(aux_cmdr.split("\r\n")); 
+	    			List<String> listDB = Arrays.asList(aux_cmdr.split("\n")); 
 					ret = execProcess(listDB);
 				}
 	    		catch (InterruptedException e)
 	    		{
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 					ret = e.getMessage();
 				}
@@ -202,10 +193,11 @@ public class ECMchecksCmds {
 		boolean ehDiffDBcmdr	= true;
 
 		//Fill the file content to compare...
-    	//String fileContent 		= "";
-		//fileContent				= readAllFile(fileCMD);
-		//if (fileContent.trim().contentEquals(aux_cmdr.trim()))
-		//	ehDiffDBcmdr 		= false; 
+    	String fileContent 		= "";
+		fileContent				= readAllFile(fileCMD);
+
+		if (fileContent.trim().contentEquals(aux_cmdr.trim()))
+			ehDiffDBcmdr 		= false; 
 
     	if (ehDiffDBcmdr)
     	{
@@ -307,7 +299,6 @@ public class ECMchecksCmds {
 		}
 		catch (IOException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
