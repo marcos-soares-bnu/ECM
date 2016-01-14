@@ -13,7 +13,6 @@ import java.util.List;
 import output.SyncPipe;
 
 
-
 public class ECMchecksCmds {
 
 	public String path_out;
@@ -76,6 +75,7 @@ public class ECMchecksCmds {
 		}
 		return vetCmdsInt;
 	}
+
 	
 	private String changeParams(CmdsHandler cmdhi, String aux_in)
 	{
@@ -96,7 +96,6 @@ public class ECMchecksCmds {
 	public void callCmdsInterval() throws IOException
 	{
 		CmdsHandler cmdhi		= new CmdsHandler();
-//        Date execTime			= new Date();
 		String aux_path			= this.path_out;
 		FileWriter writer 		= new FileWriter(aux_path, false);
 		
@@ -136,22 +135,14 @@ public class ECMchecksCmds {
 	        			//Treat intern parameters and Replace for database values...
 	        			aux_cmdi			= changeParams(cmdhi, aux_cmdi);
 	                	
-	    	        	//Change @LOGFILE to path_out... - Jan/2016   
-	    	        	aux_cmdi			= aux_cmdi.replace("@LOGFILE", (aux_path + "." + this.check_cd));
-	        			
 	            		//Call Process to update/create tmp CMD... 
 	            		updRecCmdFileTmp(s, aux_cmdi);
 					}
 	        	}
 	        	
-	    		//Call Process to update/create tmp CMD... 
-	    		//String fileCMD 				= updRecCmdFileTmp("tmp." + this.check_cd + ".cmd", aux_cmdr);
-				
 	    		//Call execution...
 	    		System.out.println("Starting Check Execution - " + aux_code + "...");
 	    		String ret 					= "0";
-	            //ChecksExec execChk		= new ChecksExec(Integer.parseInt(this.getCheck_cd()), execTime);
-	    		//ret	= execChk.callCheckCMD(fileCMD);
 	    		try
 	    		{
 	    			List<String> listDB = Arrays.asList(aux_cmdr.split("\n")); 
@@ -186,6 +177,7 @@ public class ECMchecksCmds {
     	cmdhi.dbClose();
         writer.close();
 	}
+
 	
 	private String updRecCmdFileTmp(String fileTmp, String aux_cmdr) throws IOException
 	{
@@ -237,15 +229,17 @@ public class ECMchecksCmds {
 
 		// write any other commands you want here
 		for (String s : list)
-		{ 
-			stdin.println(s); 
+		{
+			if (!s.isEmpty())
+			{
+				stdin.println(s);
+			}
 		} 
-		    
+		//    
 	    stdin.close();
 	    int returnCode = p.waitFor();
-	    System.out.println("Return code = " + returnCode);
 	    //
-		return String.valueOf(returnCode);
+    	return String.valueOf(returnCode);
 	}
 	
 	
@@ -253,20 +247,18 @@ public class ECMchecksCmds {
 	{
 		try
 		{
-			//***TESTE***
-			//execProcess("tmp.4.cmd");
-			//execProcess("tmp.3.cmd");
-			//***********
-
 			//
-			ECMchecksCmds ecmCmds22 = new ECMchecksCmds("22", "mptest_infra.log");
-			ecmCmds22.callCmdsInterval();
-			
-			
 			ECMchecksCmds ecmCmds1 = new ECMchecksCmds("11", "mptest_infra.log");
 			ecmCmds1.callCmdsInterval();
 			//
 			//refactoring cmds no DB... 
+
+			ECMchecksCmds ecmCmds22 = new ECMchecksCmds("22", "mptest_infra.log");
+			ecmCmds22.callCmdsInterval();
+			//
+			//refactoring cmds no DB... - testing OTASS - 004 ok 
+			
+			
 			
 			// 
 			//ECMchecksCmds ecmCmds1 = new ECMchecksCmds("1", "mps_infra.log");
