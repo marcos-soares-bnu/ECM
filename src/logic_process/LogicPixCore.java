@@ -33,16 +33,16 @@ public class LogicPixCore extends Logic {
         if (diffExp > 3 || diffImp > 3 || diffReco > 3 || diffDel > 3) {
             //Algum processo em erro, verificarei qual deles é
             if (diffExp > 3) {
-                error += "Process 'Export' is freezed " + diffExp + " minutes.";
+                error += "Process 'Export' is frozen " + diffExp + " minutes.";
             }
             if (diffImp > 3) {
-                error += "Process 'FileImport' is freezed " + diffImp + " minutes.";
+                error += "Process 'FileImport' is frozen " + diffImp + " minutes.";
             }
             if (diffReco > 3) {
-                error += "Process 'Reco' is freezed " + diffReco + " minutes.";
+                error += "Process 'Reco' is frozen " + diffReco + " minutes.";
             }
             if (diffDel > 3) {
-                error += "Process 'Deleter' is freezed " + diffDel + " minutes.";
+                error += "Process 'Deleter' is frozen " + diffDel + " minutes.";
             }
         }
         checkInfos.setError(error);
