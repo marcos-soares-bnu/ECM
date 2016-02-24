@@ -144,6 +144,10 @@ public class DBUtil {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        
+        String[] strSplit = strExec.split(":");
+        strExec = strSplit[0] + ":" + strSplit[1];
+        
         return strExec;
     }
 

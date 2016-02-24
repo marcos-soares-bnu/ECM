@@ -227,7 +227,7 @@ public class DBCheckOutput {
 
             //Check if exists last errors 
             if (!strDBLastExec.isEmpty()) {
-                String condition = "check_id=" + this.getCheck_id() + " AND exec_time = '" + strDBLastExec + "'";
+                String condition = "check_id=" + this.getCheck_id() + " AND exec_time LIKE '" + strDBLastExec + "'";
                 ResultSet rs = db.doSelect("*", Constantes.DB_ChecksOutput_Table, condition);
 
                 try {
