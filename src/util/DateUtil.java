@@ -15,6 +15,7 @@ public class DateUtil {
     DateFormat sdfCMD = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.GERMANY);
     DateFormat sdfFiles = new SimpleDateFormat("MM/dd/yyyy hh:mm a", Locale.GERMANY);
     DateFormat sdfFilesPix = new SimpleDateFormat("MM/dd/yyyy hh:mm:ss a", Locale.GERMANY);
+    DateFormat sdfConfigFCIR = new SimpleDateFormat("MM/dd/yyyy hh:mm", Locale.GERMANY);
     SimpleDateFormat sdfWeekDay = new SimpleDateFormat("EEEE", Locale.GERMANY);
     SimpleDateFormat sdfJustTime = new SimpleDateFormat("hh:mm a", Locale.GERMANY);
     SimpleDateFormat sdfJustHour = new SimpleDateFormat("HH", Locale.GERMANY);
@@ -24,6 +25,16 @@ public class DateUtil {
         Date dt = null;
         try {
             dt = (Date) sdfFiles.parse(s);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return dt;
+    }
+    
+    public Date getDateFromFCIRConfig(String s) {
+        Date dt = null;
+        try {
+            dt = (Date) sdfConfigFCIR.parse(s);
         } catch (ParseException e) {
             e.printStackTrace();
         }

@@ -200,12 +200,18 @@ public class CheckHandler {
         String[] subErrorChecks = s.split(Constantes.STRING_SUBERROR);
         return subErrorChecks;
     }
-    
+       
     private Date getDateNow(TXTCheck checkInfos) {
         String strdate = checkInfos.getConfig().replace("\n", " ");
-        strdate = strdate.trim().substring(4);
-        Date dateNOW = dtUtil.getDateFromString(strdate);
-        
+        Date dateNOW;
+        //For date format with week day and AM/PM included
+        if (strdate.substring(0, 3).matches("[a-zA-Z]+")) {
+        	strdate = strdate.trim().substring(4);
+        	dateNOW = dtUtil.getDateFromString(strdate);
+        //For date format without week day and AM/PM included
+        } else {
+        	dateNOW = dtUtil.getDateFromFCIRConfig(strdate);
+        }
         return dateNOW;
     }
 }
