@@ -210,8 +210,10 @@ public class CheckHandler {
         	dateNOW = dtUtil.getDateFromString(strdate);
         //For date format without week day and AM/PM included
         } else {
-        	dateNOW = dtUtil.getDateFromFCIRConfig(strdate);
-        }
+        	//Format a string "20160314135709.731000+060" to "03/14/2016 13:57"
+        	String dateAux = strdate.substring(4, 6)+"/"+strdate.substring(6, 8)+"/"+strdate.substring(0, 4)+" "+strdate.substring(8, 10)+":"+strdate.substring(10, 12);
+        	dateNOW = dtUtil.getDateFromFCIRConfig(dateAux);
+        }	
         return dateNOW;
     }
 }

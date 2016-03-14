@@ -248,13 +248,13 @@ public class ECMchecksCmds {
 		try
 		{
 			//
-			ECMchecksCmds ecmCmds1 = new ECMchecksCmds("11", "mptest_infra.log");
+			ECMchecksCmds ecmCmds1 = new ECMchecksCmds("555", "marlon_fcir.log");
 			ecmCmds1.callCmdsInterval();
 			//
 			//refactoring cmds no DB... 
 
-			ECMchecksCmds ecmCmds22 = new ECMchecksCmds("22", "mptest_infra.log");
-			ecmCmds22.callCmdsInterval();
+//			ECMchecksCmds ecmCmds22 = new ECMchecksCmds("22", "mptest_infra.log");
+//			ecmCmds22.callCmdsInterval();
 			//
 			//refactoring cmds no DB... - testing OTASS - 004 ok 
 			
