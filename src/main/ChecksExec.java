@@ -219,8 +219,14 @@ public class ChecksExec {
                         //OTASS013 new verifications
                         if (cItem.getItemName().equals("OTASS013")) {
                             dbOutput.setMail_sent(1);
+                            
+                            //Apenas insere o OTASS013 em caso de erros para manter o histórico no DB.
+                            if (dbOutput.getOutput_error().contains("(ERROR)")){
+                                dbOutput.DB_store();
+                            }
+                        } else {
+                            dbOutput.DB_store();
                         }
-                        dbOutput.DB_store();
                     }
                 }
             } else {

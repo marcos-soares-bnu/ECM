@@ -107,7 +107,17 @@ public class CheckHandler {
                     if (item.getCheck_id() == Constantes.DB_PIXCORE_ID) {
                         if (item.getItemName().equalsIgnoreCase("PIX001") || item.getItemName().equalsIgnoreCase("PIX002") || item.getItemName().equalsIgnoreCase("PIX003") || item.getItemName().equalsIgnoreCase("PIX004")) {
                             if (item.getStatus().equalsIgnoreCase("NOK")) {
-                                item.setStatus("WARNING");
+                                //check for error string
+                                boolean error = false;
+                                for (OBJCheckOutput outp : item.getErrors().values()) {
+                                    if (outp.getOutput_error().contains("(Error)")) {
+                                        error = true;
+                                        break;
+                                    }
+                                }
+                                if (!error) {
+                                    item.setStatus("WARNING");
+                                }
                             }
                         }
                     }

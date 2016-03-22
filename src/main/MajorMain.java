@@ -73,15 +73,14 @@ public class MajorMain {
 
         LogicOTASS13 otass013 = new LogicOTASS13();
         otass013.MainMethod();
+        if (Constantes.USE_MAIL_SEND) {
+            //System.out.println("==================================================================================================================================");
+            System.out.println("Executing the Send Mail...");
+            //System.out.println("==================================================================================================================================");
 
-//        if (Constantes.USE_MAIL_SEND) {
-//            //System.out.println("==================================================================================================================================");
-//            System.out.println("Executing the Send Mail...");
-//            //System.out.println("==================================================================================================================================");
-//
-//            SendMails sendMails = new SendMails();
-//            sendMails.startSend();
-//        }
+            SendMails sendMails = new SendMails();
+            sendMails.startSend();
+        }
 
         //System.out.println("==================================================================================================================================");
         executionTime = new Date();
