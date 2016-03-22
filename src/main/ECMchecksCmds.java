@@ -131,7 +131,26 @@ public class ECMchecksCmds {
 	        		for (String s : vCmdsInt)
 	        		{
 	        			String aux_cmdi		= cmdhi.selectCmdBody("0", s);
-	
+	        			
+	        			//MPS***  trata os programas externos  *********************
+	        			if (aux_cmdi.indexOf("@@") > 0)
+	        			{
+	    	            	List<String> vCmdsInti	= getListInternCmds(aux_cmdi, "@@|##", 20); 
+	    	            	aux_cmdi				= aux_cmdi.replace("@@", "").replace("##", "");
+
+	    	        		for (String si : vCmdsInti)
+	    	        		{
+	    	        			String aux_cmdin	= cmdhi.selectCmdBody("0", si);
+	    	        			
+	    	        			//Treat intern parameters and Replace for database values...
+	    	        			aux_cmdin			= changeParams(cmdhi, aux_cmdin);
+
+	    	        			//Call Process to update/create tmp CMD... 
+	    	            		updRecCmdFileTmp(si, aux_cmdin);
+	    	        		}
+	        			}
+	        			//**********************************************************
+	        			
 	        			//Treat intern parameters and Replace for database values...
 	        			aux_cmdi			= changeParams(cmdhi, aux_cmdi);
 	                	
@@ -248,16 +267,22 @@ public class ECMchecksCmds {
 		try
 		{
 			//
-			ECMchecksCmds ecmCmds1 = new ECMchecksCmds("11", "mptest_infra.log");
-			ecmCmds1.callCmdsInterval();
+			//ECMchecksCmds ecmCmds1 = new ECMchecksCmds("111", "mptest_infra.log");
+			//ecmCmds1.callCmdsInterval();
 			//
-			//refactoring cmds no DB... 
+			//refactoring cmds no DB... (testado por Marlon) ok 
 
-			ECMchecksCmds ecmCmds22 = new ECMchecksCmds("22", "mptest_infra.log");
-			ecmCmds22.callCmdsInterval();
-			//
-			//refactoring cmds no DB... - testing OTASS - 004 ok 
 			
+			//ECMchecksCmds ecmCmds222 = new ECMchecksCmds("222", "mptest_otass.log");
+			//ecmCmds222.callCmdsInterval();
+			//
+			//refactoring cmds no DB... - testado MPS ok 
+
+			
+			ECMchecksCmds ecmCmds333 = new ECMchecksCmds("333", "mptest_dpwin.log");
+			ecmCmds333.callCmdsInterval();
+			//
+			//refactoring cmds no DB... - testado MPS.... 
 			
 			
 			// 
