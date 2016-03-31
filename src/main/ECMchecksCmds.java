@@ -279,10 +279,10 @@ public class ECMchecksCmds {
 			//refactoring cmds no DB... - testado MPS ok 
 
 			
-			ECMchecksCmds ecmCmds333 = new ECMchecksCmds("333", "mptest_dpwin.log");
-			ecmCmds333.callCmdsInterval();
+			//ECMchecksCmds ecmCmds333 = new ECMchecksCmds("333", "mptest_dpwin.log");
+			//ecmCmds333.callCmdsInterval();
 			//
-			//refactoring cmds no DB... - testado MPS.... 
+			//refactoring cmds no DB... - testado MPS ok 
 			
 			
 			// 
@@ -306,6 +306,12 @@ public class ECMchecksCmds {
 //
 //			ECMchecksCmds ecmCmds7 = new ECMchecksCmds("7", "mps_icc.log");
 //			ecmCmds7.callCmdsInterval();
+			
+
+			ECMchecksCmds ecmCmds77 = new ECMchecksCmds("77", "mptest_icc.log");
+			ecmCmds77.callCmdsInterval();
+			
+			//ajustes no ICC... 
 			
 			
 			//if (args.length > 1)
