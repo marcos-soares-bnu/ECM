@@ -215,18 +215,7 @@ public class ChecksExec {
                         //Create the error output
                         //Record objCheck information on DB...
                         DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, output, exec_time, isNew);
-                        
-                        //OTASS013 new verifications
-                        if (cItem.getItemName().equals("OTASS013")) {
-                            dbOutput.setMail_sent(1);
-                            
-                            //Apenas insere o OTASS013 em caso de erros para manter o histórico no DB.
-                            if (dbOutput.getOutput_error().contains("(ERROR)")){
-                                dbOutput.DB_store();
-                            }
-                        } else {
-                            dbOutput.DB_store();
-                        }
+                        dbOutput.DB_store();
                     }
                 }
             } else {
@@ -329,6 +318,7 @@ public class ChecksExec {
                     dbOutput.DB_store();
                 } else {
                   //Senão insere como erro novo
+                	
                     DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, err.getOutput_error(), exec_time, 1); //isNew=1);
                     dbOutput.DB_store();
                 }
@@ -380,8 +370,14 @@ public class ChecksExec {
         }
 
         for (String s : listaErrosTratados) {
-            OBJCheckOutput outerr = new OBJCheckOutput(s);
-            this.recordArrCheckIsNewError(checkID, checkItemID, outerr, exec_time, status);
+        	//Product Backlog Item 12: (LINDE - Java Logic) Update - 
+        	//Alteração OTASS013 para não imprimir a lista de Jobs sem erros na tabela de Output...
+        	//
+        	if (s.contains("(ERROR)")){
+                OBJCheckOutput outerr = new OBJCheckOutput(s);
+                this.recordArrCheckIsNewError(checkID, checkItemID, outerr, exec_time, status);
+        	}
+        	//Product Backlog Item 12
         }
     }
 
@@ -473,14 +469,28 @@ public class ChecksExec {
                         dbOutput.DB_store();
                     }
                 } else {
-                    // Ndocs <= 1000 = Normal Process...
-                    if (arrayItemLastErrors.contains(partName)) {
-                        DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 0); //isNew=0);
-                        dbOutput.DB_store();
-                    } else {
-                        DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 1); //isNew=1);
-                        dbOutput.DB_store();
-                    }
+                	//Product Backlog Item 11: (LINDE - Java Logic) Update -  (18)(19)(20) 
+                	//Alteração MON 18-19-20 para alterar STATUS = Warning,   (95)MON019_2 
+                	//quando nos itens for identificado "Disabled"            (97)MON020_2
+                	if ( (s.contains("(disabled0)")) && (checkID == 1) && (checkItemID == 18 || checkItemID == 19 || checkItemID == 20 || checkItemID == 95 || checkItemID == 97) ){
+                		DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, "WARNING", s, exec_time, 0); //isNew=0);
+                		dbOutput.DB_store();
+                	} else {
+                	
+	                    // Ndocs <= 1000 = Normal Process...
+	                    if (arrayItemLastErrors.contains(partName)) {
+	                        DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 0); //isNew=0);
+	                		//Product Backlog Item 12: add mail sent = 1 to OTASS013 = 35
+	                		if ( (checkID == 2) && (checkItemID == 35) ){dbOutput.setMail_sent(1);}
+	                        dbOutput.DB_store();
+	                    } else {
+	                        DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, s, exec_time, 1); //isNew=1);
+	                		//Product Backlog Item 12: add mail sent = 1 to OTASS013 = 35
+	                		if ( (checkID == 2) && (checkItemID == 35) ){dbOutput.setMail_sent(1);}
+	                        dbOutput.DB_store();
+	                    }
+	                    
+                	}//Product Backlog Item 11: end
                 }
             }
         }
