@@ -5,12 +5,41 @@ import java.util.Date;
 import OTASS013.LogicOTASS13;
 import util.Constantes;
 import change.ChangeCheck;
+import database.DBCheckOutput;
 
 public class MajorMain {
 
     public static void main(String[] args) {
         Date executionTime = new Date();
 
+        //*****************************************************************************************************
+        //MPS - BUG :01
+        ChecksExec infraTEST = new ChecksExec(Constantes.DB_INFRA_ID, executionTime);
+        //So procede se existem itens (nao esta em change)
+        if (infraTEST.getObjCheck().getItens().size() > 0) {
+        	infraTEST.execCheck();
+        	infraTEST.storeINDB();
+        }
+        //MPS - BUG :01
+        System.exit(0);
+        
+        
+        
+        //MPS - Clear Pending tickets already analyzed...  	- OK 12/APR
+        DBCheckOutput debugMPS = new DBCheckOutput();
+        debugMPS.DB_updateMailSentPending(executionTime);
+
+        //MPS - New Logic to Checks with Intervals...  		- OK 14/APR
+        ChecksExec otassMPS = new ChecksExec(Constantes.DB_OTASS_ID, executionTime);
+        if (otassMPS.getObjCheck().getItens().size() > 0) {
+        	otassMPS.execCheck();
+            otassMPS.storeINDB();
+        }
+        
+        System.exit(0);
+        //MPS
+        //*****************************************************************************************************
+        
         System.out.println("Starting the execution of the SCHEDULED Scripts at:\n" + executionTime);
 
         //System.out.println("==================================================================================================================================");

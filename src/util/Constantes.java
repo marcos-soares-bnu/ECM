@@ -8,6 +8,7 @@ public class Constantes {
     public static final String DB_CheckItens_Table = "check_scripts_itens";
     public static final String DB_CheckConfig_Table = "check_scripts_configs";
     public static final String DB_ChecksOutput_Table = "check_scripts_output";
+    public static final String DB_ChecksOutputBKP_Table = "check_scripts_output_backup";
     public static final String DB_OTASS_Table = "linde_otass";
     public static final String DB_OTASS_JOBS_Table = "otass_jobs";
     public static final String DB_OTASS013_JOBS_STATUS_Table = "otass013_jobs_status";
@@ -51,9 +52,9 @@ public class Constantes {
     public static final String MAIL_TARGET_CC = "FMB-ECM-BR@t-systems.com.br";
     
     //Testing reasons
-    public static final boolean LINDE_CMDS_INTERVAL = false;
+    public static final boolean LINDE_CMDS_INTERVAL = true;//false;
     
-    public static final boolean LINDE_ENVIRONMENT = true;
+    public static final boolean LINDE_ENVIRONMENT = false;//true;
     public static final boolean USE_MAIL_SEND = false;//true;
     public static final boolean SHOW_DB_MESSAGES = false;
     public static final boolean SHOW_OTHER_MESSAGES = false;

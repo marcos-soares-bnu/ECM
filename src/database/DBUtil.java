@@ -125,12 +125,79 @@ public class DBUtil {
         return strExec;
     }
 
+    //
+    //Bug 16: (LINDE - Java Logic) Update - Rotina de atualização (No Errors) dos checks fora do INTERVALO
+    //
+    public String[] getLastStatusOutput(int checkID, int checkItemID, String strExecTime) {
+
+    	String[] vals = new String[2];
+    	
+    	String fields = "status, output_error";
+        String table = Constantes.DB_ChecksOutputBKP_Table;
+        
+        String condition = "check_id=" + checkID + " AND check_item_id=" + checkItemID + " AND exec_time like '" + strExecTime + "%'";
+        ResultSet rs = this.doSelect(fields, table, condition);
+        String strError = "No Errors.";
+        String strStatus = "OK";
+        try {
+            if (rs.next()) {
+                String status = rs.getString("status");
+                String error = rs.getString("output_error");
+                if (error != null) {
+                    strError = error;
+                    strStatus = status;
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        vals[0] = strStatus;
+        vals[1] = strError;
+        return vals;
+    }
+
+    //
+    //Bug 16: (LINDE - Java Logic) Update - Rotina de atualização (No Errors) dos checks fora do INTERVALO
+    //
+    public String getLastExecTime(int checkID, int checkItemID, Date execTime) {
+        String fields = "MAX(exec_time)";
+        String table = Constantes.DB_ChecksOutputBKP_Table;
+        String dbExecTime = dtUtil.getDBFormat(execTime);
+
+        String condition = "check_id=" + checkID + " AND check_item_id=" + checkItemID + " AND exec_time <> '" + dbExecTime + "'";
+        ResultSet rs = this.doSelect(fields, table, condition);
+
+        String strExec = "";
+        try {
+            if (rs.next()) {
+                Timestamp execDB = rs.getTimestamp("MAX(exec_time)");
+                if (execDB != null) {
+                    strExec = dtUtil.getStrDateFromDB(execDB.getTime());
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        
+        String[] strSplit = strExec.split(":");
+        strExec = strSplit[0] + ":" + strSplit[1];
+        
+        return strExec;
+    }
+    //
+    
     public String getLastExecTime(int checkID, Date execTime) {
         String fields = "MAX(exec_time)";
         String table = Constantes.DB_ChecksOutput_Table;
         String dbExecTime = dtUtil.getDBFormat(execTime);
 
+        //MPS - Change to adopt new logic to clean Pending tickets...(get the last date for any checkID)
         String condition = "check_id=" + checkID + " AND exec_time <> '" + dbExecTime + "'";
+        if (checkID == 0){
+        	condition = "exec_time <> '" + dbExecTime + "'";
+        }
+        //MPS
         ResultSet rs = this.doSelect(fields, table, condition);
 
         String strExec = "";

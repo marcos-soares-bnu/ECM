@@ -99,6 +99,10 @@ public class CheckHandler {
         
         for (TXTCheck checkInfos : txtChecksInfos.values()) {
             OBJCheckItem item = check.getItem(checkInfos.getNomeCheck());
+            
+            //MPS - Set flag ischecked = true to control Checks with interval that are into the logs...
+            //item == null - could be that this check is disabled into config table...
+            if (item != null) { item.setIschecked(true); }
 
             if (checkInfos.getConfig().isEmpty()) {
                 Map<Integer, OBJCheckOutput> errorsMap = this.getErrorsMap(checkInfos.getError());

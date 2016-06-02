@@ -19,10 +19,10 @@ public class ConnectionManager {
     public Connection getConnection() {
         try {
             
-            if (!Constantes.LINDE_ENVIRONMENT) {
-                myUrl = "jdbc:mysql://10.58.87.19/testes";
-                pass = "Munique";
-            }
+            //if (!Constantes.LINDE_ENVIRONMENT) {
+            //    myUrl = "jdbc:mysql://10.58.87.19/testes";
+            //    pass = "Munique";
+            //}
             
             if (conn == null) {
                 return DriverManager.getConnection(myUrl, user, pass);

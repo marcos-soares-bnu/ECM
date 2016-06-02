@@ -9,6 +9,8 @@ public class OBJCheckItem {
     private int check_id;
     private String itemName;
     private String status;
+    //MPS - add control field to interval checks...
+    private boolean ischecked; 
 
     private Map<Integer, OBJCheckOutput> errors;
 
@@ -19,6 +21,9 @@ public class OBJCheckItem {
         this.status = "OK";
 
         this.errors = new HashMap<Integer, OBJCheckOutput>();
+        
+        //MPS - add control field to interval checks...
+        this.setIschecked(false);
     }
 
     public int getId() {
@@ -77,4 +82,13 @@ public class OBJCheckItem {
             errors.put(errors.size() + 1, err);
         }
     }
+
+    //MPS - add control field to interval checks...
+	public boolean isIschecked() {
+		return ischecked;
+	}
+
+	public void setIschecked(boolean ischecked) {
+		this.ischecked = ischecked;
+	}
 }

@@ -15,6 +15,7 @@ import database.DBCheck;
 import database.DBCheckConfig;
 import database.DBCheckItem;
 import database.DBCheckOutput;
+import database.DBUtil;
 import object.OBJCheck;
 import object.OBJCheckItem;
 import object.OBJCheckOutput;
@@ -88,10 +89,13 @@ public class ChecksExec {
 //*******************************************************************************************
         	//MPS - Add var para testes dos Cmds com intervalos...
         	if (Constantes.LINDE_CMDS_INTERVAL){
+
+                dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_infra_TEST.log");
+                //dbCheckConfig.setPath_output("C:\\Temp\\script result\\sched_otass_VAZIO.log");
         		
-				ECMchecksCmds ecmCmds = new ECMchecksCmds(String.valueOf(objCheck.getId()), dbCheckConfig.getPath_cmd());
-				try { ecmCmds.callCmdsInterval(); }
-				catch (IOException e) { e.printStackTrace(); }
+//				ECMchecksCmds ecmCmds = new ECMchecksCmds(String.valueOf(objCheck.getId()), dbCheckConfig.getPath_cmd());
+//				try { ecmCmds.callCmdsInterval(); }
+//				catch (IOException e) { e.printStackTrace(); }
         	}
         	else {
         	
@@ -219,11 +223,37 @@ public class ChecksExec {
                     }
                 }
             } else {
-                String output = "No Errors.";
+            	
+            	String output = "No Errors.";
+            	//MPS Test - New Logic to Checks with Interval...
+            	if (Constantes.LINDE_CMDS_INTERVAL)
+            	{
+            		//Check if cItem is into the Log, else recovery and replicate the last error in DB...
+            		if (cItem.isIschecked())
+            		{
+            			System.out.println("Check (" + cItem.getItemName() + ") no LOG...OK - registrando - No Errors.");
+            		}
+            		else
+            		{
+            			System.out.println("Check (" + cItem.getItemName() + ") NAO verificado nesta exec...Replicando ult. erro no BD");
+
+                        //Get Last status/output... to fill dbOutput and record in DB.
+            			String[] lasts = new String[2];
+            			DBUtil db = new DBUtil();
+                        String strDBLastExec = db.getLastExecTime(checkID, checkItemID, exec_time);
+                        lasts = db.getLastStatusOutput(checkID, checkItemID, strDBLastExec);
+            	        db.closeConn();
+                        //
+            	        if (lasts != null) {
+                            status = lasts[0];
+                            output = lasts[1];
+            	        }            	        
+            		}
+            	}
                 //Create the error output
                 //Record objCheck information on DB...
                 DBCheckOutput dbOutput = new DBCheckOutput(checkID, checkItemID, status, output, exec_time);
-                dbOutput.DB_store();
+//                dbOutput.DB_store();
             }
         }
     }

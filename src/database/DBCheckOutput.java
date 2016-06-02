@@ -4,8 +4,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JOptionPane;
@@ -297,6 +299,105 @@ public class DBCheckOutput {
         db.closeConn();
     }
 
+
+    //*****************************************************************************************************
+    //Product Backlog Item 15: (LINDE - Java Logic) New - Rotina de limpeza dos "Pending Tickets"
+    //MPS - Clear Pending tickets already analyzed according check_item_id bellow...  
+    //35 = OTASS13 #Outro tratamento
+    //44 = FCIR004 #Deve ser aberto o ticket mesmo assim
+    //47, 48, 49, 50 = PIX001 - PIX004 #Apenas warnings
+    public void DB_updateMailSentPending(Date exec_time) {
+
+        DBUtil db = new DBUtil();
+        String condition = "";
+        ResultSet rs = null;
+        String table = "";
+        String field = "mail_sent";
+        PreparedStatement pstmt = null;
+    	List<String> pendingTicketsLst = new ArrayList<String>(); 
+    	List<String> lastErrorsLst = new ArrayList<String>(); 
+        
+        //************** GET PENDING TICKETS ***
+//        condition = "is_new = 1 AND " + field + " = 0 AND check_item_id NOT IN (35, 44, 47, 48, 49, 50)";
+        condition = "is_new = 1 AND " + field + " = 0 AND check_item_id IN (23, 26, 30)";
+        rs = db.doSelect("*", Constantes.DB_ChecksOutputBKP_Table, condition);
+
+        try {
+            while (rs.next()) {
+            	int checkID = rs.getInt("check_id");
+                int checkItemID = rs.getInt("check_item_id");
+            	pendingTicketsLst.add(Integer.toString(checkID) + "_"  + Integer.toString(checkItemID));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, e);
+        }
+    	
+    	
+        //************** GET LAST ERRORS IF pendingTicketsLst IS NOT EMPTY ***    	
+        if (!pendingTicketsLst.isEmpty()){
+        
+	        //Get lastExecTime (for any Check_id = 0)...
+	        String strDBLastExec = db.getLastExecTime(0, exec_time);
+	
+	        //Check if exists last errors 
+	        if (!strDBLastExec.isEmpty()) {
+	        	//*** MAI/2016 - VALIDACAO VITHOR - REESTRINGIR MAIS O SELECT... 
+	            condition = "exec_time LIKE '" + strDBLastExec + "%'" + 
+	            			" AND " + field + " = 1 AND check_item_id NOT IN (35, 44, 47, 48, 49, 50)";
+	            //*** MAI/2016
+	            rs = db.doSelect("*", Constantes.DB_ChecksOutput_Table, condition);
+	
+	            try {
+	                while (rs.next()) {
+	                	int checkID = rs.getInt("check_id");
+	                    int checkItemID = rs.getInt("check_item_id");
+	                    lastErrorsLst.add(Integer.toString(checkID) + "_"  + Integer.toString(checkItemID));
+	                }
+	            } catch (SQLException e) {
+	                e.printStackTrace();
+	                JOptionPane.showMessageDialog(null, e);
+	            }
+	        }
+	        //
+	        //************** UPDATE PENDING TICKETS, that contains into lastErrorsLst ***
+	    	List<String> fieldList = new ArrayList<String>(); 
+			for (String s : pendingTicketsLst)
+			{
+				if (lastErrorsLst.contains(s)){fieldList.add(s);}
+			}
+			//Update All pend_sel found...
+	        table = Constantes.DB_ChecksOutputBKP_Table;
+	        try {
+	        	
+	        	StringBuffer sb = new StringBuffer();  
+
+	            sb.append("  UPDATE " + table + "      \n");
+	            sb.append("     SET " + field + " = 1  \n");
+	            sb.append("   WHERE is_new = 1 AND " + field + " = 0 AND Concat(check_id, '_', check_item_id) IN (  \n");
+
+	            for(int i = 0; i < fieldList.size(); i++) {
+	                if(i == 0) {
+	                    sb.append("    '"+fieldList.get(i)+"'   \n");
+	                } else {
+	                    sb.append("   ,'"+fieldList.get(i)+"'   \n");
+	                }
+	            }
+	            sb.append("             )     \n");	        	
+	        	
+	            pstmt = db.getConn().prepareStatement(sb.toString());
+	            
+	        } catch (SQLException e) {
+	            JOptionPane.showMessageDialog(null, e);
+	        }
+	        db.doINSERT(pstmt);
+        }
+        //
+        db.closeConn();
+    }
+    //MPS***************************************************************************************************
+    
+    
     public void DB_updateMailSentOTASS013() {
         DBUtil db = new DBUtil();
         String table = Constantes.DB_OTASS013_JOBS_STATUS_Table;
